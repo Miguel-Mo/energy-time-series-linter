@@ -14,6 +14,12 @@ export function validateConfig(c: Config, data: CsvData) {
   if (!['start', 'end'].includes(c.intervalPosition)) throw new Error('Selecciona inicio o fin de intervalo.');
   if (c.timezone && !validZone(c.timezone)) throw new Error('Zona horaria desconocida. Usa un identificador IANA, como Europe/Madrid.');
   if (c.intervalMinutes !== null && (!Number.isFinite(c.intervalMinutes) || c.intervalMinutes <= 0 || c.intervalMinutes > 525600)) throw new Error('La duración debe estar entre 0 y 525.600 minutos.');
+  if (c.cadenceMinutes !== null && (!Number.isFinite(c.cadenceMinutes) || c.cadenceMinutes <= 0 || c.cadenceMinutes > 525600)) throw new Error('La cadencia debe estar entre 0 y 525.600 minutos.');
+  if (!!c.expectedStart !== !!c.expectedEnd) throw new Error('Indica inicio y fin del periodo esperado.');
+  if (c.expectedStart && c.expectedEnd) {
+    const start = parseTime(c.expectedStart, c.timezone).ms, end = parseTime(c.expectedEnd, c.timezone).ms;
+    if (start === null || end === null || end < start) throw new Error('El periodo esperado necesita fechas inequívocas y un fin igual o posterior al inicio.');
+  }
   if (c.highValue !== null && (!Number.isFinite(c.highValue) || c.highValue <= 0)) throw new Error('El umbral debe ser positivo y finito.');
   if (!Number.isFinite(c.constantHours) || c.constantHours <= 0 || !Number.isFinite(c.jumpFactor) || c.jumpFactor <= 1) throw new Error('Revisa los umbrales de constantes y saltos.');
 }
@@ -83,7 +89,7 @@ export function analyze(data: CsvData, c: Config, file: Report['file']): Report 
   const ranked = [...frequencies].sort((a, b) => b[1] - a[1] || a[0] - b[0]);
   const support = ranked.length ? ranked[0][1] / deltas.length : null;
   const mode = deltas.length >= 2 && support !== null && support > 0.5 ? ranked[0][0] : null;
-  const reference = c.intervalMinutes !== null ? c.intervalMinutes * 60000 : mode;
+  const reference = c.cadenceMinutes !== null ? c.cadenceMinutes * 60000 : mode;
   add('TS_FREQUENCY', [], mode === null ? 'no determinable' : `${mode / 1000} s; soporte ${(support! * 100).toFixed(1)}%`);
   if (reference !== null) {
     deltas.forEach((d, i) => {
@@ -92,7 +98,7 @@ export function analyze(data: CsvData, c: Config, file: Report['file']): Report 
       if (Math.abs(d - reference) > reference * 0.01) add('TS_IRREGULAR', rows, `${d / 1000} s`);
     });
   } else {
-    skip(['TS_GAP'], 'No hay duración elegida ni frecuencia predominante fiable.');
+    skip(['TS_GAP'], 'No hay cadencia elegida ni frecuencia predominante fiable.');
     if (frequencies.size > 1) add('TS_IRREGULAR', [], `${frequencies.size} separaciones distintas; sin moda predominante`);
   }
   if (interval && c.intervalMinutes !== null) {
@@ -127,16 +133,30 @@ export function analyze(data: CsvData, c: Config, file: Report['file']): Report 
   const valid = values.filter((v): v is number => v !== null);
   const first = sorted[0] ?? null, last = sorted.at(-1) ?? null;
   const elapsed = first !== null && last !== null ? (last - first) / 1000 : null;
-  // Grid completeness is only meaningful when all timestamps resolve and every point lies on the reference grid.
-  const grid = reference !== null && first !== null && times.every(t => t.ms !== null) && sorted.every(t => Math.abs((t - first) / reference - Math.round((t - first) / reference)) < 1e-6);
-  const expected = grid && elapsed !== null ? Math.round(elapsed * 1000 / reference!) + 1 : null;
-  const complete = new Set(times.filter((t, i) => t.ms !== null && values[i] !== null && data.rows[i].length === data.headers.length).map(t => t.ms)).size;
+  // Expected bounds refer to timestamps, inclusively. They never crop or rewrite the source series.
+  const periodStart = c.expectedStart ? parseTime(c.expectedStart, c.timezone).ms : first;
+  const periodEnd = c.expectedEnd ? parseTime(c.expectedEnd, c.timezone).ms : last;
+  const onGrid = (t: number) => reference !== null && periodStart !== null && Math.abs((t - periodStart) / reference - Math.round((t - periodStart) / reference)) < 1e-6;
+  const inside = (t: number) => periodStart !== null && periodEnd !== null && t >= periodStart && t <= periodEnd;
+  const present = sorted.filter(inside);
+  const grid = periodEnd !== null && onGrid(periodEnd) && times.every(t => t.ms !== null) && present.every(onGrid);
+  const count = grid ? Math.round((periodEnd! - periodStart!) / reference!) + 1 : null;
+  const expected = count !== null && Number.isSafeInteger(count) && count > 0 ? count : null;
+  const complete = new Set(times.filter((t, i) => t.ms !== null && inside(t.ms) && values[i] !== null && data.rows[i].length === data.headers.length).map(t => t.ms)).size;
+  const outside = times.filter(t => t.ms !== null && !inside(t.ms)).length;
+  const boundaryMissing = expected === null ? null : present.length === 0 ? expected : Math.round((present[0] - periodStart!) / reference!) + Math.round((periodEnd! - present.at(-1)!) / reference!);
+  if (c.expectedStart) {
+    if (boundaryMissing) add('TS_EXPECTED_BOUNDARY_GAP', [], `${boundaryMissing} posiciones ausentes en los extremos del periodo elegido`);
+    if (outside) add('TS_OUTSIDE_EXPECTED_PERIOD', [], `${outside} registros fuera del periodo elegido; se conservan en el análisis energético`);
+    if (expected === null) skip(['TS_EXPECTED_BOUNDARY_GAP'], 'No se puede determinar una rejilla temporal para el periodo elegido.');
+  } else skip(['TS_EXPECTED_BOUNDARY_GAP', 'TS_OUTSIDE_EXPECTED_PERIOD'], 'No se ha elegido un periodo esperado.');
+  const completenessReason = expected !== null ? null : reference === null ? 'Falta una cadencia de referencia fiable.' : times.some(t => t.ms === null) ? 'Hay fechas sin resolver.' : 'El periodo o los registros no forman una rejilla temporal exacta y representable.';
   const scale = c.unit.startsWith('M') ? 1000 : c.unit.startsWith('k') ? 1 : 0.001;
   let reason: string | null = null;
   let total: number | null = null, subtotal: number | null = null;
   let method = '';
   const hasErrors = [...map.values()].some(f => f.severity === 'error');
-  if (hasErrors || !data.rows.length || times.some(t => t.ms === null) || valid.length !== data.rows.length) reason = 'Hay errores, valores ausentes o timestamps sin resolver.';
+  if (hasErrors || !data.rows.length || times.some(t => t.ms === null) || valid.length !== data.rows.length) reason = `No se calcula energía: ${[...map.values()].filter(f => f.severity === 'error' || ['TS_ZONE_REQUIRED', 'TS_LOCAL_AMBIGUOUS', 'TS_UNSUPPORTED'].includes(f.code)).map(f => f.description).join(' ')}`;
   else if (map.has('TS_OUT_OF_ORDER')) reason = 'Los registros están fuera de orden.';
   else if (map.has('TS_ZONE_MISMATCH')) reason = 'El offset y la zona seleccionada no coinciden.';
   else if (map.has('VALUE_UNIT_SHIFT')) reason = 'Revisa el posible cambio de unidad antes de interpretar un total.';
@@ -175,9 +195,10 @@ export function analyze(data: CsvData, c: Config, file: Report['file']): Report 
   else if (c.measurement === 'power-instant' && !map.has('TS_GAP') && !map.has('TS_IRREGULAR') && times.every(t => t.ms !== null) && reference !== null) covered = elapsed;
   const findings = [...map.values()].sort((a, b) => a.code.localeCompare(b.code, 'en'));
   return {
-    reportVersion: '1.0.0', appVersion: APP_VERSION, file, configuration: { ...c },
+    reportVersion: '2.0.0', appVersion: APP_VERSION, file, configuration: { ...c },
     observed: { delimiter: data.delimiter, headers: data.headers, rows: data.rows.length, offsets, formats },
-    inferences: { frequencySeconds: mode === null ? null : mode / 1000, frequencySupport: support, expectedRecords: expected, completenessPercent: expected ? Math.min(100, 100 * complete / expected) : null },
+    inferences: { frequencySeconds: mode === null ? null : mode / 1000, frequencySupport: support, referenceSeconds: reference === null ? null : reference / 1000, expectedRecords: expected, temporalCompletenessPercent: expected ? Math.min(100, 100 * present.length / expected) : null, usableCompletenessPercent: expected ? Math.min(100, 100 * complete / expected) : null, periodBasis: c.expectedStart ? 'configured' : 'observed', periodStart: periodStart === null ? null : new Date(periodStart).toISOString(), periodEnd: periodEnd === null ? null : new Date(periodEnd).toISOString(), presentRecords: present.length, usableRecords: complete, missingBoundaryRecords: boundaryMissing, reason: completenessReason },
+    quality: { validValuePercent: values.length ? valid.length * 100 / values.length : null, duplicateRecords: times.filter(t => t.ms !== null).length - sorted.length, outsidePeriodRecords: outside },
     temporal: { first: first === null ? null : new Date(first).toISOString(), last: last === null ? null : new Date(last).toISOString(), elapsedSeconds: elapsed, coveredSeconds: covered, validTimestamps: times.filter(t => t.ms !== null).length, uniqueTimestamps: sorted.length, timezone: c.timezone || 'Offsets explícitos del archivo' },
     values: { valid: valid.length, missing: values.length - valid.length, min: valid.length ? valid.reduce((a, b) => Math.min(a, b)) : null, max: valid.length ? valid.reduce((a, b) => Math.max(a, b)) : null, mean: valid.length ? valid.reduce((s, v) => s + v / valid.length, 0) : null, negative: valid.filter(v => v < 0).length },
     energy: { totalKWh: total, observedSubtotalKWh: subtotal, method, reason }, findings,

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { EXAMPLES } from '../../src/examples';
+import AxeBuilder from '@axe-core/playwright';
 
 test('offline analysis, JSON export, finding details and responsive layout', async ({ page, context }, testInfo) => {
   const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
@@ -23,7 +24,7 @@ test('offline analysis, JSON export, finding details and responsive layout', asy
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Descargar JSON' }).click();
   const download = await downloadPromise; const json = JSON.parse(await readFile((await download.path())!, 'utf8'));
-  expect(json.reportVersion).toBe('1.0.0'); expect(json.energy.totalKWh).toBeNull(); expect(json.file.sha256).toBe(createHash('sha256').update(EXAMPLES.duplicate.text).digest('hex'));
+  expect(json.reportVersion).toBe('2.0.0'); expect(json.energy.totalKWh).toBeNull(); expect(json.file.sha256).toBe(createHash('sha256').update(EXAMPLES.duplicate.text).digest('hex'));
   expect(requests).toEqual([]); expect(errors).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(await context.cookies()).toEqual([]);
@@ -74,4 +75,61 @@ test('examples, energy calculation and hostile cell content stay local and inert
   await page.locator('#file').setInputFiles({ name: '<script>.csv', mimeType: 'text/csv', buffer: Buffer.from('timestamp,power_kW\n2024-01-01T00:00Z,<img src=x onerror=alert(1)>') });
   await expect(page.locator('#preview')).toContainText('<img src=x onerror=alert(1)>');
   await expect(page.locator('#preview img')).toHaveCount(0);
+});
+
+test('guided configuration, linked errors and expected-period summary', async ({ page }, testInfo) => {
+  await page.goto('/'); await page.getByRole('button', { name: 'Probar ejemplo' }).click();
+  await expect(page.getByRole('status')).toContainText('Archivo leído');
+  await expect(page.locator('#interval')).toBeHidden();
+  await page.getByLabel('Tipo de medición').selectOption('power-mean');
+  await expect(page.locator('#interval')).toBeVisible();
+  await expect(page.locator('#measurement-help')).toContainText('0,5 kWh');
+  await page.getByLabel('He revisado').check(); await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await expect(page.locator('#form-errors')).toBeFocused();
+  await expect(page.locator('#interval')).toHaveAttribute('aria-invalid', 'true');
+  await page.getByRole('link', { name: 'Indica cuántos minutos abarca cada medición.' }).click();
+  await expect(page.locator('#interval')).toBeFocused();
+  await page.locator('#interval').fill('10'); await page.getByLabel('Cadencia esperada (min)', { exact: true }).fill('15');
+  await page.getByText('Periodo esperado · opcional', { exact: true }).click();
+  await page.locator('#expected-start').fill('2023-12-31T23:45Z'); await page.locator('#expected-end').fill('2024-01-01T01:15Z');
+  await page.getByLabel('He revisado').check(); await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await expect(page.getByRole('status')).toContainText('Análisis terminado');
+  await expect(page.locator('#summary')).toContainText('5 instantes presentes / 7 esperados');
+  await expect(page.locator('#summary')).toContainText('Valores interpretables');
+  await expect(page.locator('#completeness-explanation')).toContainText('Ausencias en los extremos: 2');
+  await expect(page.locator('#energy-total')).toContainText('1,6667 kWh');
+  await page.locator('#results').screenshot({ path: testInfo.outputPath('guided-report.png'), scale: 'css' });
+});
+
+test('local timestamps require a timezone and hidden duration is not reused', async ({ page }) => {
+  await page.goto('/'); await page.locator('#file').setInputFiles({ name: 'local.csv', mimeType: 'text/csv', buffer: Buffer.from(EXAMPLES['correct-15min'].text.replaceAll('Z', '')) });
+  await expect(page.getByRole('status')).toContainText('Archivo leído');
+  await page.getByLabel('Tipo de medición').selectOption('power-mean'); await page.locator('#interval').fill('60');
+  await page.getByLabel('Tipo de medición').selectOption('power-instant');
+  await page.getByLabel('He revisado').check(); await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await expect(page.locator('#timezone')).toHaveAttribute('aria-invalid', 'true');
+  await page.locator('#timezone').fill('Europe/Madrid'); await page.getByLabel('He revisado').check();
+  await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await expect(page.locator('#energy-total')).toHaveText('2 kWh · aproximada');
+});
+
+test('keyboard, accessible errors, contrast and narrow-screen reflow', async ({ page }) => {
+  await page.goto('/'); await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Saltar al contenido' })).toBeFocused();
+  await page.keyboard.press('Enter'); await expect(page.locator('#main')).toBeFocused();
+  await page.getByRole('button', { name: 'Probar ejemplo' }).click(); await expect(page.getByRole('status')).toContainText('Archivo leído');
+  await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await expect(page.locator('#form-errors')).toBeFocused();
+  let result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+  expect(result.violations).toEqual([]);
+  await page.getByRole('link', { name: 'Selecciona qué representa la medición.' }).focus(); await page.keyboard.press('Enter');
+  await expect(page.locator('#measurement')).toBeFocused();
+  await page.keyboard.press('ArrowDown'); await page.keyboard.press('Tab');
+  await page.locator('#confirm').focus(); await page.keyboard.press('Space');
+  await page.keyboard.press('Tab'); await page.keyboard.press('Enter');
+  await expect(page.locator('#results-title')).toBeFocused();
+  result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+  expect(result.violations).toEqual([]);
+  await page.setViewportSize({ width: 320, height: 800 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

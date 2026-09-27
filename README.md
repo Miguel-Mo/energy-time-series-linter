@@ -21,7 +21,7 @@ Abre la dirección local mostrada por Vite. `npm run dev` sirve para desarrollo;
 
 1. Selecciona un CSV UTF-8 o prueba uno de los diez ejemplos incluidos.
 2. Revisa la vista previa y las columnas, separador, decimal, unidad y tipo de medición. Las sugerencias no equivalen a confirmación. Potencia instantánea y media no se pueden distinguir con una cabecera `kW`.
-3. Para fechas sin offset, indica una zona IANA como `Europe/Madrid`. Para potencia media y energía por intervalo, declara la duración y si el timestamp marca inicio o fin. La duración también puede fijar la cadencia esperada de otros tipos.
+3. Para fechas sin offset, indica una zona IANA como `Europe/Madrid`. Para potencia media y energía por intervalo, declara la duración y si el timestamp marca inicio o fin. La cadencia entre timestamps se configura aparte de la duración de cada medición; opcionalmente, indica el primer y último timestamp esperados para evaluar ausencias en los extremos.
 4. Confirma la configuración y pulsa **Analizar archivo**.
 5. Filtra hallazgos y selecciona uno para inspeccionar sus registros. Descarga el informe JSON si lo necesitas.
 
@@ -63,6 +63,8 @@ La construcción usa `base: './'` y funciona tanto en dominio raíz como bajo `/
 - [Formato versionado del informe](docs/report-format.md)
 - [Ejemplos](examples/README.md)
 - [Verificación y capturas](docs/verification.md)
+- [Entrega de usabilidad 0.2.0](docs/milestones.md)
+- [Piloto de usuarios preparado, aún sin sesiones](docs/usability-pilot.md)
 
 Arquitectura: `csv.ts` interpreta CSV y números; `time.ts` interpreta instantes; `analyze.ts` ejecuta reglas puras; `worker.ts` mantiene datos y hash fuera del hilo de interfaz; `main.ts` presenta los resultados. `rules.ts` es el catálogo que genera `docs/rules.md`. Sin framework de interfaz. Las versiones exactas de dependencias están fijadas en `package.json` y `package-lock.json`.
 

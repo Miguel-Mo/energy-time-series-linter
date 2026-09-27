@@ -8,7 +8,7 @@ import { EXAMPLES } from '../src/examples';
 import { RULES } from '../src/rules';
 import { MAX_BYTES, type Config } from '../src/types';
 
-const config: Config = { timestampColumn: 0, valueColumn: 1, unit: 'kW', measurement: 'power-instant', timezone: '', decimal: '.', delimiter: ',', intervalMinutes: null, intervalPosition: 'start', highValue: null, constantHours: 24, jumpFactor: 10 };
+const config: Config = { timestampColumn: 0, valueColumn: 1, unit: 'kW', measurement: 'power-instant', timezone: '', decimal: '.', delimiter: ',', intervalMinutes: null, cadenceMinutes: null, expectedStart: null, expectedEnd: null, intervalPosition: 'start', highValue: null, constantHours: 24, jumpFactor: 10 };
 const run = (text: string, changes: Partial<Config> = {}) => {
   const csv = parseCsv(text);
   return analyze(csv, { ...config, delimiter: csv.delimiter, ...changes }, { name: 'fixture.csv', bytes: Buffer.byteLength(text), sha256: createHash('sha256').update(text).digest('hex') });
@@ -82,7 +82,7 @@ describe('timestamps, offset semantics and DST', () => {
     for (const id of ['dst-spring', 'dst-autumn']) {
       const result = example(id, { timezone: 'Europe/Madrid' });
       expect(result.inferences.frequencySeconds).toBe(900);
-      expect(result.inferences.completenessPercent).toBe(100);
+      expect(result.inferences.temporalCompletenessPercent).toBe(100);
       expect(result.energy.totalKWh).toBe(1.5);
       expect(result.findings.some(f => ['TS_GAP', 'TS_DUPLICATE_TIMESTAMP', 'TS_OUT_OF_ORDER', 'TS_OFFSET_CHANGE'].includes(f.code))).toBe(false);
     }
@@ -90,7 +90,7 @@ describe('timestamps, offset semantics and DST', () => {
   it('does not manufacture a gap over spring with local timestamps', () => {
     const text = EXAMPLES['dst-spring'].text.replace(/\+0[12]:00/g, '');
     const result = run(text, { timezone: 'Europe/Madrid' });
-    expect(result.inferences.completenessPercent).toBe(100); expect(result.energy.totalKWh).toBe(1.5);
+    expect(result.inferences.temporalCompletenessPercent).toBe(100); expect(result.energy.totalKWh).toBe(1.5);
   });
   it.each(['2024-03-31T02:30:00', '2024-10-27T02:30:00'])('rejects ambiguous or nonexistent local hour %s without moving it', value => {
     expect(parseTime(value, 'Europe/Madrid').issue).toBe('TS_LOCAL_AMBIGUOUS');
@@ -123,14 +123,14 @@ describe('intervals and findings', () => {
   });
   it('detects a gap, estimates completeness and does not integrate through it', () => {
     const r = example('gap'); expect(r.findings.some(f => f.code === 'TS_GAP')).toBe(true);
-    expect(r.inferences.expectedRecords).toBe(5); expect(r.inferences.completenessPercent).toBe(80); expect(r.energy.totalKWh).toBeNull();
+    expect(r.inferences.expectedRecords).toBe(5); expect(r.inferences.temporalCompletenessPercent).toBe(80); expect(r.energy.totalKWh).toBeNull();
   });
   it('does not calculate power energy from unordered rows', () => {
     const r = example('unordered'); expect(r.findings.some(f => f.code === 'TS_OUT_OF_ORDER')).toBe(true); expect(r.energy.totalKWh).toBeNull();
   });
   it('does not invent a predominant frequency for ties or one pair', () => {
     const r = run(series(['2024-01-01T00:00Z,1', '2024-01-01T00:15Z,1', '2024-01-01T00:45Z,1']));
-    expect(r.inferences.frequencySeconds).toBeNull(); expect(r.inferences.completenessPercent).toBeNull();
+    expect(r.inferences.frequencySeconds).toBeNull(); expect(r.inferences.temporalCompletenessPercent).toBeNull();
     expect(r.findings.some(f => f.code === 'TS_IRREGULAR')).toBe(true);
     expect(run(series(['2024-01-01T00:00Z,1', '2024-01-01T00:15Z,1'])).energy.totalKWh).toBeNull();
   });
@@ -140,18 +140,18 @@ describe('intervals and findings', () => {
     expect(example('correct-15min').rulesNotExecuted.some(r => r.code === 'TS_OVERLAP')).toBe(true);
   });
   it('does not double-count duplicated records as complete', () => {
-    expect(example('duplicate').inferences.completenessPercent).toBe(100);
+    expect(example('duplicate').inferences.temporalCompletenessPercent).toBe(100);
     expect(example('duplicate').inferences.expectedRecords).toBe(3);
   });
   it('does not show complete data when the timestamps cannot be resolved', () => {
     const r = run(series(['2024-01-01T00:00Z,1', '2024-01-01T00:15Z,1', '2024-01-01T00:30,1']));
-    expect(r.inferences.completenessPercent).toBeNull();
+    expect(r.inferences.temporalCompletenessPercent).toBeNull();
   });
 });
 
 describe('energy semantics and value heuristics', () => {
   it('integrates 2 kW over one hour, without extrapolating a final interval', () => expect(example('correct-15min').energy.totalKWh).toBe(2));
-  it('allows explicit duration with two power samples', () => expect(run(series(['2024-01-01T00:00Z,2', '2024-01-01T00:15Z,2']), { intervalMinutes: 15 }).energy.totalKWh).toBe(.5));
+  it('allows explicit duration with two power samples', () => expect(run(series(['2024-01-01T00:00Z,2', '2024-01-01T00:15Z,2']), { cadenceMinutes: 15 }).energy.totalKWh).toBe(.5));
   it('computes mean power using every declared interval', () => {
     expect(example('correct-15min', { measurement: 'power-mean', intervalMinutes: 15 }).energy.totalKWh).toBe(2.5);
     expect(example('correct-15min', { measurement: 'power-mean' }).energy.totalKWh).toBeNull();
@@ -196,7 +196,7 @@ describe('limits and reproducibility', () => {
     expect(serializeReport(a)).toBe(serializeReport(b)); expect(JSON.parse(serializeReport(a))).toEqual(a);
     expect(a.file.sha256).toMatch(/^[a-f0-9]{64}$/);
     expect([...a.rulesExecuted, ...a.rulesNotExecuted.map(r => r.code)].sort()).toEqual(Object.keys(RULES).sort());
-    expect(a.reportVersion).toBe('1.0.0');
+    expect(a.reportVersion).toBe('2.0.0');
   });
   it('keeps source data unchanged', () => {
     const data = parseCsv(EXAMPLES.unordered.text), before = JSON.stringify(data);
@@ -215,10 +215,62 @@ describe('limits and reproducibility', () => {
   it('analyzes 100,000 valid records within the file limit', () => {
     const text = series(Array.from({ length: 100000 }, (_, i) => `${new Date(Date.UTC(2024, 0, 1) + i * 900000).toISOString()},2`));
     expect(Buffer.byteLength(text)).toBeLessThan(MAX_BYTES);
-    const r = run(text); expect(r.observed.rows).toBe(100000); expect(r.counts.error).toBe(0); expect(r.inferences.completenessPercent).toBe(100);
+    const r = run(text); expect(r.observed.rows).toBe(100000); expect(r.counts.error).toBe(0); expect(r.inferences.temporalCompletenessPercent).toBe(100);
     expect(r.energy.totalKWh).toBe(49999.5);
   }, 30000);
   it('maintains package and report app versions together', () => {
     expect(example('correct-15min').appVersion).toBe(JSON.parse(readFileSync('package.json', 'utf8')).version);
+  });
+});
+
+describe('guided interpretation and separate completeness metrics', () => {
+  it('keeps cadence independent from measurement duration', () => {
+    const r = example('correct-15min', { measurement: 'power-mean', intervalMinutes: 10, cadenceMinutes: 15 });
+    expect(r.energy.totalKWh).toBeCloseTo(5 / 3);
+    expect(r.inferences.referenceSeconds).toBe(900);
+    expect(r.temporal.coveredSeconds).toBe(3000);
+    expect(r.findings.some(f => f.code === 'TS_IRREGULAR')).toBe(false);
+  });
+  it('shows missing boundary timestamps in a configured inclusive period', () => {
+    const r = example('correct-15min', { cadenceMinutes: 15, expectedStart: '2023-12-31T23:45Z', expectedEnd: '2024-01-01T01:15Z' });
+    expect(r.inferences.expectedRecords).toBe(7);
+    expect(r.inferences.presentRecords).toBe(5);
+    expect(r.inferences.missingBoundaryRecords).toBe(2);
+    expect(r.inferences.temporalCompletenessPercent).toBeCloseTo(500 / 7);
+    expect(r.findings.some(f => f.code === 'TS_EXPECTED_BOUNDARY_GAP')).toBe(true);
+    expect(r.energy.totalKWh).toBe(2);
+  });
+  it('separates temporal presence, numeric validity and duplicates', () => {
+    const r = run(series(['2024-01-01T00:00Z,2', '2024-01-01T00:15Z,bad', '2024-01-01T00:15Z,2', '2024-01-01T00:30Z,2']));
+    expect(r.inferences.temporalCompletenessPercent).toBe(100);
+    expect(r.quality.duplicateRecords).toBe(1);
+    expect(r.quality.validValuePercent).toBe(75);
+    expect(r.energy.totalKWh).toBeNull();
+  });
+  it('separates unusable numbers from missing timestamps', () => {
+    const r = run(series(['2024-01-01T00:00Z,2', '2024-01-01T00:15Z,', '2024-01-01T00:30Z,2']));
+    expect(r.inferences.temporalCompletenessPercent).toBe(100);
+    expect(r.inferences.usableCompletenessPercent).toBeCloseTo(200 / 3);
+  });
+  it('does not crop energy to the chosen completeness period', () => {
+    const r = example('correct-15min', { expectedStart: '2024-01-01T00:15Z', expectedEnd: '2024-01-01T00:45Z' });
+    expect(r.inferences.expectedRecords).toBe(3); expect(r.inferences.presentRecords).toBe(3);
+    expect(r.quality.outsidePeriodRecords).toBe(2); expect(r.energy.totalKWh).toBe(2);
+  });
+  it('counts a fully missing declared period', () => {
+    const r = example('correct-15min', { expectedStart: '2024-01-02T00:00Z', expectedEnd: '2024-01-02T01:00Z' });
+    expect(r.inferences.temporalCompletenessPercent).toBe(0); expect(r.inferences.missingBoundaryRecords).toBe(5);
+  });
+  it('keeps a nonaligned period or unresolved timestamps undeterminable', () => {
+    expect(example('correct-15min', { expectedStart: '2024-01-01T00:01Z', expectedEnd: '2024-01-01T01:00Z' }).inferences.temporalCompletenessPercent).toBeNull();
+  });
+  it('rejects incomplete, reversed and ambiguous expected bounds', () => {
+    expect(() => example('correct-15min', { expectedStart: '2024-01-01T00:00Z' })).toThrow(/inicio y fin/);
+    expect(() => example('correct-15min', { expectedStart: '2024-01-02T00:00Z', expectedEnd: '2024-01-01T00:00Z' })).toThrow(/periodo/);
+    expect(() => example('dst-autumn', { timezone: 'Europe/Madrid', expectedStart: '2024-10-27T02:30', expectedEnd: '2024-10-27T03:30' })).toThrow(/inequívocas/);
+  });
+  it('uses UTC elapsed time across DST for an expected local period', () => {
+    const r = example('dst-spring', { timezone: 'Europe/Madrid', expectedStart: '2024-03-31T01:30', expectedEnd: '2024-03-31T03:15', cadenceMinutes: 15 });
+    expect(r.inferences.expectedRecords).toBe(4); expect(r.inferences.temporalCompletenessPercent).toBe(100);
   });
 });

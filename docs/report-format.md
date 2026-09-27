@@ -1,15 +1,16 @@
-# Informe JSON 1.0.0
+# Informe JSON 2.0.0
 
 Formato propio de salida de la aplicación, no estándar energético ni certificado. UTF-8, JSON con sangría de dos espacios y salto de línea final. `null` significa no determinable/no disponible; nunca cero implícito. Todos los números exportados son finitos. No incluye fecha de ejecución para conservar reproducibilidad.
 
 | Campo | Contenido |
 | --- | --- |
-| `reportVersion` | `1.0.0`, versión semántica del formato. Cambios incompatibles incrementarán la versión mayor. |
+| `reportVersion` | `2.0.0`, versión semántica del formato. Cambios incompatibles incrementarán la versión mayor. |
 | `appVersion` | Versión del algoritmo/interfaz que generó el informe. |
 | `file` | `name`, `sha256` hexadecimal en minúscula calculado sobre bytes originales, `bytes`. No contiene el archivo completo. |
-| `configuration` | Opciones **elegidas**: índices base cero `timestampColumn`, `valueColumn`; `measurement`, `unit`, `timezone`, `decimal`, `delimiter`, `intervalMinutes`, `intervalPosition`, `highValue`, `constantHours`, `jumpFactor`. |
+| `configuration` | Opciones **elegidas**: índices base cero `timestampColumn`, `valueColumn`; `measurement`, `unit`, `timezone`, `decimal`, `delimiter`, `intervalMinutes`, `intervalPosition`, `cadenceMinutes`, `expectedStart`, `expectedEnd`, `highValue`, `constantHours`, `jumpFactor`. |
 | `observed` | Delimitador usado, cabeceras originales, recuento de registros, offsets normalizados a `±HH:mm` y firmas de formato observadas. Los offsets de fechas locales son resultado de su interpretación con la zona configurada. |
-| `inferences` | `frequencySeconds`, `frequencySupport` (0..1), `expectedRecords`, `completenessPercent` (0..100). Son inferencias sujetas a la rejilla temporal documentada, no observaciones directas. |
+| `inferences` | `frequencySeconds`, `frequencySupport` (0..1), `referenceSeconds`, `expectedRecords`; `temporalCompletenessPercent` y `usableCompletenessPercent` (0..100); `periodBasis` (`observed` o `configured`), `periodStart`, `periodEnd` (UTC), `presentRecords`, `usableRecords`, `missingBoundaryRecords`, `reason`. Inferencias sujetas a la rejilla documentada. |
+| `quality` | `validValuePercent`: números interpretables / filas, independiente de fechas; `duplicateRecords`: repeticiones adicionales de instantes resueltos; `outsidePeriodRecords`: filas con timestamp resuelto fuera del periodo elegido. |
 | `temporal` | `first`, `last` en UTC ISO; `elapsedSeconds`, `coveredSeconds`; `validTimestamps`, `uniqueTimestamps`; `timezone`. Los límites se refieren a timestamps de las filas, no a los límites externos de intervalos. |
 | `values` | `valid`, `missing` (todos los valores excluidos, vacíos o inválidos), `min`, `max`, `mean`, `negative`, en la unidad elegida. No representa estadística ponderada por tiempo. |
 | `energy` | `totalKWh`, `observedSubtotalKWh`, `method` y `reason`. Un subtotal de contador con reinicio nunca es el total. El signo se conserva. El total de intervalos solo representa registros disponibles. |
@@ -18,9 +19,19 @@ Formato propio de salida de la aplicación, no estándar energético ni certific
 | `rulesExecuted` | Códigos de reglas evaluadas, incluidas las que no produjeron incidencias. |
 | `rulesNotExecuted` | `{code, reason}` para cada regla cuya condición de aplicación no se cumplió o que fue desactivada. Junto con las ejecutadas cubre el catálogo completo sin duplicados. |
 
-Tipos de medición: `power-instant`, `power-mean`, `interval-energy`, `counter`. Unidades: `W`, `kW`, `MW`, `Wh`, `kWh`, `MWh`. `timezone: ""` significa usar solo los offsets presentes; nunca la zona por defecto del navegador. `intervalMinutes` y `highValue` son positivos o `null`. `intervalPosition`: `start` o `end`. `constantHours` por defecto 24, `jumpFactor` por defecto 10. Los decimales son `.` o `,`; los delimitadores `,`, `;`, `\t` o `|`.
+Tipos de medición: `power-instant`, `power-mean`, `interval-energy`, `counter`. Unidades: `W`, `kW`, `MW`, `Wh`, `kWh`, `MWh`. `timezone: ""` significa usar solo los offsets presentes; nunca la zona por defecto del navegador. `intervalMinutes`, `cadenceMinutes` y `highValue` son positivos o `null`. La duración y la cadencia son independientes. `expectedStart` y `expectedEnd` son cadenas temporales inequívocas o ambos `null`; los extremos son timestamps esperados incluidos. `intervalPosition`: `start` o `end`. `constantHours` por defecto 24, `jumpFactor` por defecto 10. Los decimales son `.` o `,`; los delimitadores `,`, `;`, `\t` o `|`.
 
 ## Un hallazgo
+
+Desde la versión 2.0.0, `temporalCompletenessPercent` mide presencia de timestamps y `usableCompletenessPercent` exige además al menos un valor numérico válido y anchura correcta en ese instante. Un duplicado puede contener datos contradictorios aunque ambos porcentajes sean 100 %: consulta siempre `quality.duplicateRecords` y los hallazgos. `presentRecords` y `usableRecords` cuentan instantes únicos en el periodo; `observed.rows` y `values.valid` cuentan filas de todo el archivo.
+
+`missingBoundaryRecords` cuenta las posiciones de rejilla anteriores al primer instante presente y posteriores al último dentro del periodo, o todas si el periodo está vacío. No incluye huecos interiores. `reason` explica por qué no se puede calcular completitud. Una cadencia muy pequeña que produzca un número no representable de posiciones se deja como `null`.
+
+### Migración desde 1.0.0
+
+La aplicación no importa informes previos. Los consumidores externos deben comprobar `reportVersion`. Se elimina `inferences.completenessPercent`, cuyo concepto combinado se separa en dos métricas. Se añaden `quality` y metadatos del periodo. `configuration.intervalMinutes` pasa a significar solo duración de una media o energía por intervalo; `cadenceMinutes` es la separación esperada entre registros. No se copia automáticamente el antiguo valor a ambos campos: el usuario debe confirmar esas dos interpretaciones.
+
+### Ejemplo de hallazgo
 
 ```json
 {

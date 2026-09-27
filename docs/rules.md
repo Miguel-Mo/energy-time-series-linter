@@ -4,6 +4,20 @@ Generado a partir de `src/rules.ts`; actualiza con `npm run docs:generate`.
 
 Cada regla agrega incidencias con muestras y referencias a registros CSV (cabecera = 1). No cambia datos. `error`: interpretación impedida; `warning`: ambigüedad o sospecha; `info`: característica o límite. Las hipótesis no se elevan a errores definitivos. Los umbrales y cálculos detallados están en [scope.md](scope.md).
 
+## TS_EXPECTED_BOUNDARY_GAP
+
+- Severidad: **warning**.
+- Resultado: Faltan timestamps al inicio o al final del periodo esperado.
+- Lógica: Rejilla inclusiva de timestamps con cadencia explícita o inferida; no se imputan registros.
+- Revisión sugerida: Comprueba el periodo elegido y la exportación del origen.
+
+## TS_OUTSIDE_EXPECTED_PERIOD
+
+- Severidad: **warning**.
+- Resultado: Hay registros fuera del periodo esperado.
+- Lógica: Se excluyen de la completitud del periodo, pero no se eliminan ni se excluyen del análisis energético.
+- Revisión sugerida: Revisa los límites elegidos. La energía sigue refiriéndose a los datos del archivo.
+
 ## CSV_EMPTY
 
 - Severidad: **error**.
@@ -204,7 +218,7 @@ Cada regla agrega incidencias con muestras y referencias a registros CSV (cabece
 
 - Severidad: **info**.
 - Resultado: Resumen de frecuencia temporal.
-- Lógica: Moda única de diferencias positivas entre instantes únicos ordenados, con soporte > 50%; una sola diferencia no basta. La duración elegida tiene prioridad para evaluar intervalos.
+- Lógica: Moda única de diferencias positivas entre instantes únicos ordenados, con soporte > 50%; una sola diferencia no basta. La cadencia elegida tiene prioridad para evaluar separaciones; la duración solo describe cada medición.
 - Revisión sugerida: Confirma la cadencia esperada si la conoces.
 
 ## TS_GAP

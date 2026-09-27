@@ -1,6 +1,6 @@
 {
   "name": "energy-time-series-linter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "papaparse": "5.7.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.63.0",
     "@types/node": "26.6.3",
     "@types/papaparse": "5.5.2",

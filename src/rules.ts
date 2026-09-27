@@ -1,6 +1,8 @@
 import type { Severity } from './types';
 const rule = (severity: Severity, description: string, suggestion: string, technical: string) => ({ severity, description, suggestion, technical });
 export const RULES = {
+  TS_EXPECTED_BOUNDARY_GAP: rule('warning', 'Faltan timestamps al inicio o al final del periodo esperado.', 'Comprueba el periodo elegido y la exportación del origen.', 'Rejilla inclusiva de timestamps con cadencia explícita o inferida; no se imputan registros.'),
+  TS_OUTSIDE_EXPECTED_PERIOD: rule('warning', 'Hay registros fuera del periodo esperado.', 'Revisa los límites elegidos. La energía sigue refiriéndose a los datos del archivo.', 'Se excluyen de la completitud del periodo, pero no se eliminan ni se excluyen del análisis energético.'),
   CSV_EMPTY: rule('error', 'El archivo no contiene registros.', 'Añade un encabezado y al menos un registro.', 'Un archivo vacío o solo con cabecera no es una serie.'),
   CSV_REQUIRED_COLUMNS: rule('error', 'Faltan columnas para fecha y valor.', 'Revisa el separador o proporciona al menos dos columnas.', 'Este MVP necesita dos columnas distintas; una para tiempo y otra para una medición.'),
   CSV_PARSE: rule('error', 'La sintaxis CSV no se puede interpretar de forma fiable.', 'Revisa comillas, delimitador y codificación UTF-8.', 'Papa Parse comunica errores de sintaxis; no se corrigen los datos.'),
@@ -29,7 +31,7 @@ export const RULES = {
   TS_ZONE_MISMATCH: rule('warning', 'Un offset no coincide con la zona seleccionada.', 'Comprueba la zona y el offset del archivo.', 'Se compara el offset explícito con el offset IANA de ese instante; no se sobrescribe.'),
   TS_DUPLICATE_TIMESTAMP: rule('error', 'Hay timestamps que representan el mismo instante.', 'Revisa los registros repetidos en el origen.', 'Comparación del instante UTC, aunque la representación escrita sea diferente.'),
   TS_OUT_OF_ORDER: rule('warning', 'Los registros no están en orden temporal.', 'Revisa el orden del archivo original.', 'Se compara con el timestamp válido previo; no se reordena el archivo ni se integra potencia desordenada.'),
-  TS_FREQUENCY: rule('info', 'Resumen de frecuencia temporal.', 'Confirma la cadencia esperada si la conoces.', 'Moda única de diferencias positivas entre instantes únicos ordenados, con soporte > 50%; una sola diferencia no basta. La duración elegida tiene prioridad para evaluar intervalos.'),
+  TS_FREQUENCY: rule('info', 'Resumen de frecuencia temporal.', 'Confirma la cadencia esperada si la conoces.', 'Moda única de diferencias positivas entre instantes únicos ordenados, con soporte > 50%; una sola diferencia no basta. La cadencia elegida tiene prioridad para evaluar separaciones; la duración solo describe cada medición.'),
   TS_GAP: rule('warning', 'Posible hueco respecto a la cadencia de referencia.', 'Comprueba si faltan registros o si el muestreo es variable.', 'Diferencia > referencia × 1.01. Es una inferencia; se opera en UTC para respetar DST.'),
   TS_IRREGULAR: rule('warning', 'La separación temporal no coincide con la referencia.', 'Comprueba si la frecuencia es variable.', 'Diferencia distinta de la referencia con tolerancia del 1%; si no hay moda, se advierte la irregularidad global.'),
   TS_OVERLAP: rule('warning', 'Los intervalos declarados se solapan.', 'Revisa duración y significado del timestamp.', 'Solo energía por intervalo o potencia media con duración explícita; delta < duración. Se considera el intervalo [inicio, fin).'),
