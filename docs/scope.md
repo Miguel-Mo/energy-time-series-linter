@@ -8,7 +8,7 @@ Límites: 10 MiB, 100.000 registros de datos, 100 columnas, 60 segundos por oper
 
 ## Perfil temporal
 
-Se admite `AAAA-MM-DDTHH:mm[:ss[.SSS]]` con `Z`, `±HH:mm` o sin offset; se acepta espacio en lugar de T y t/z en minúscula. Fracción decimal de 1 a 3 cifras y solo con segundos. El calendario se comprueba estrictamente: no se convierte el 31 de abril en mayo. Precisión interna: milisegundos.
+Se admite `AAAA-MM-DDTHH:mm[:ss[.SSS]]` con `Z`, `±HH:mm`, `±HHmm` o sin offset; se acepta espacio en lugar de T y t/z en minúscula. Fracción decimal de 1 a 3 cifras y solo con segundos. El calendario se comprueba estrictamente: no se convierte el 31 de abril en mayo. Precisión interna: milisegundos. Desde 0.4.0 se interpreta el offset compacto publicado por CoSSMic; los offsets del resumen se representan como `±HH:mm`, conservando bytes, hash y celdas originales. `-0000`, como `-00:00`, queda fuera del perfil; no se interpreta como UTC.
 
 Fechas regionales, años expandidos, semana/ordinal ISO, submilisegundos, `24:00`, segundos intercalares y offset desconocido `-00:00` no se interpretan automáticamente. Un formato fuera de perfil produce advertencia; una fecha imposible dentro del perfil o texto sin fecha interpretable produce error. El programa no es un validador universal de ISO 8601.
 

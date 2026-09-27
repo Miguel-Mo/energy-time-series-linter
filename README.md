@@ -63,6 +63,7 @@ La construcción usa `base: './'` y funciona tanto en dominio raíz como bajo `/
 - [Formato versionado del informe](docs/report-format.md)
 - [Ejemplos](examples/README.md)
 - [Cuatro CSV de datos reales: consumo, solar y batería](examples/real/README.md)
+- [Formatos reales verificados y límites de H6](docs/real-format-compatibility.md)
 - [Verificación y capturas](docs/verification.md)
 - [Entrega de usabilidad 0.2.0](docs/milestones.md)
 - [H1: evaluación interna sin participantes y guía de prueba](docs/h1-internal-evaluation.md)

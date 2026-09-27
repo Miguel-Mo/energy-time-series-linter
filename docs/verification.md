@@ -1,4 +1,8 @@
-# Verificación de la entrega 0.3.1
+# Verificación de la entrega 0.4.0
+
+H6, primera entrega: **85 pruebas unitarias y 28 pruebas de navegador correctas**, build TypeScript/Vite correcto. Todas las filas de cuatro extractos públicos se verifican entre UTC y la columna europea con offset compacto. En escritorio y móvil se repite el flujo solar con ambas columnas, sin zona obligatoria, conservando hash y obteniendo idénticas métricas de energía y completitud. [Alcance de formatos](real-format-compatibility.md). Persiste el aviso de tamaño del paquete que incluye ejemplos locales.
+
+## Base anterior: entrega 0.3.1
 
 H1 interno reformulado: **72 pruebas unitarias y 26 casos de navegador verificados** en total. La ejecución completa pasó 24 de 26 inicialmente tras la corrección de la vista previa; los dos restantes fallaron por usar la tecla End en lugar de ArrowRight para comprobar scroll horizontal. Corregida esa acción de prueba, se repitieron los ocho recorridos H1. Los resultados definitivos y las limitaciones están documentados en [H1 interno](h1-internal-evaluation.md). Build y catálogo correctos; el build avisa de JS superior a 500 kB al incluir los ejemplos sin conexión (856 kB, 159 kB gzip).
 

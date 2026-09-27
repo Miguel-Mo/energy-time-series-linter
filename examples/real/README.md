@@ -26,7 +26,7 @@ Cuatro extractos de mediciones públicas de **CoSSMic / Open Power System Data**
 
 Los valores utilizables no equivalen a mediciones originales verificadas: la herramienta no interpreta la columna `interpolated`. La fuente regularizó y rellenó huecos. Conservamos su marcador completo (también menciona otras señales del archivo fuente); solo las menciones a la columna elegida son relevantes. Un marcador vacío no certifica ausencia de procesamiento previo.
 
-La columna auxiliar `cet_cest_timestamp` se conserva exactamente como se publicó, incluidos offsets `+0100`/`+0200`. Usa UTC para la prueba principal; elegir la auxiliar permite explorar compatibilidad con ese formato sin corregirlo previamente. El contador horario de la fuente se remuestreó con `.last()`; su etiqueta corresponde al inicio de la ventana según los metadatos. No debe interpretarse como una medida instantánea tomada exactamente a ese segundo.
+La columna auxiliar `cet_cest_timestamp` se conserva exactamente como se publicó, incluidos offsets `+0100`/`+0200`, admitidos desde la app 0.4.0. Puedes elegirla como fecha y hora sin indicar zona: debe producir los mismos instantes, energía y completitud que UTC. Para contrastar los cambios de offset con una región puedes indicar `Europe/Berlin`; no se sobrescribe el offset original. El contador horario de la fuente se remuestreó con `.last()`; su etiqueta corresponde al inicio de la ventana según los metadatos. No debe interpretarse como una medida instantánea tomada exactamente a ese segundo.
 
 Estos casos amplían la prueba técnica; no sustituyen sesiones de usabilidad con personas ni validación independiente.
 

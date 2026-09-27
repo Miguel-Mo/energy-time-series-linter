@@ -1,4 +1,4 @@
-# Hitos de usabilidad — entrega actual 0.3.1
+# Hitos de usabilidad — entrega actual 0.4.0
 
 La entrega 0.2.0 abordó H1, H2, H3 y H5; 0.3.0 añadió H4. En 0.3.1, ante la decisión del propietario de no disponer de participantes, H1 se reformula y se cierra mediante evaluación interna documentada. La validación con usuarios no se ha realizado y deja de ser requisito bloqueante; la publicación sigue pendiente.
 
@@ -9,7 +9,7 @@ La entrega 0.2.0 abordó H1, H2, H3 y H5; 0.3.0 añadió H4. En 0.3.1, ante la d
 | H3. Interpretación del resumen | Presencia temporal, valores interpretables y duplicados separados; periodo esperado explícito; causas de energía no determinable | Implementado; casos deterministas y pruebas de interfaz. |
 | H4. Navegación de hallazgos | Búsqueda por regla/descripción, filtro por fila en muestras, páginas de cinco ejemplos, vuelta con foco y limpieza de filtros | Implementado en 0.3.0. Se conserva el límite de 50 muestras por regla; la búsqueda por fila no cubre registros fuera de esas muestras. Pruebas de teclado, exportación, móvil y batería real. |
 | H5. Accesibilidad | Texto y contraste, controles táctiles, enlace de salto, foco y teclado, errores asociados, movimiento reducido, auditoría axe | Mejoras implementadas; la evaluación manual con lectores de pantalla y usuarios sigue pendiente. No es una declaración de conformidad WCAG. |
-| H6. Formatos reales | Ampliar compatibilidad usando exportaciones documentadas, sin conversiones silenciosas | Pendiente. Base disponible: cuatro CSV CoSSMic; todavía no representa variedad de proveedores. |
+| H6. Formatos reales | Offsets compactos `±HHmm`, detección de zona coherente y comparación íntegra UTC/Europa en cuatro CSV publicados | Primera entrega implementada en 0.4.0. Queda pendiente variedad de proveedores y formatos regionales con selección explícita; no se declara compatibilidad universal. |
 | H7. Guía temporal | Ayuda contextual para offsets, horas locales y cambios de horario | Ayuda básica disponible; profundización pendiente. |
 | H8. Reproducibilidad y navegadores | Ampliar pruebas fuera de Chromium y documentar diferencias temporales | Pendiente; móvil actual es emulación Chromium. |
 | H9. Portabilidad del informe | Facilitar compartir e interpretar el informe fuera de la aplicación | JSON versionado disponible; ampliación pendiente. |

@@ -4,7 +4,7 @@ import { MAX_BYTES, type Config, type CsvData, type Report } from './types';
 let source = '';
 let data: CsvData | null = null;
 let fileInfo: Report['file'];
-const localColumns = (csv: CsvData) => csv.headers.map((_, i) => i).filter(i => csv.rows.some(row => /^\d{4}-\d{2}-\d{2}[Tt ]\d{2}:\d{2}/.test(row[i]?.trim() ?? '') && !/(Z|[+-]\d{2}:\d{2})$/i.test(row[i]?.trim() ?? '')));
+const localColumns = (csv: CsvData) => csv.headers.map((_, i) => i).filter(i => csv.rows.some(row => /^\d{4}-\d{2}-\d{2}[Tt ]\d{2}:\d{2}/.test(row[i]?.trim() ?? '') && !/(Z|[+-]\d{2}:?\d{2})$/i.test(row[i]?.trim() ?? '')));
 self.onmessage = async ({ data: message }) => {
   try {
     if (message.type === 'load') {

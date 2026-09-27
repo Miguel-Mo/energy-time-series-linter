@@ -50,7 +50,7 @@ export function detect(data: CsvData): Detection {
   const dot = vals.some(v => /^[-+]?\d*\.\d+(?:e[-+]?\d+)?$/i.test(v));
   return { timestampColumn, valueColumn, unit: unit ?? null, measurement: /counter|acumulad/i.test(header) ? 'counter' : null,
     decimal: comma && dot ? null : comma ? ',' : '.', delimiter: data.delimiter,
-    hasLocalTimestamps: sample.some(r => !/(Z|[+-]\d{2}:\d{2})$/i.test(r[timestampColumn] ?? '')) };
+    hasLocalTimestamps: sample.some(r => !/(Z|[+-]\d{2}:?\d{2})$/i.test(r[timestampColumn] ?? '')) };
 }
 
 export function parseNumber(raw: string, decimal: '.' | ','): { value: number | null; issue?: 'VALUE_MISSING' | 'VALUE_INVALID' | 'VALUE_NONFINITE' } {

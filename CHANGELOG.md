@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 2026-09-27
+
+- H6, primera entrega: soporte de offsets compactos como +0100/+0200 en fechas del perfil admitido, tal como aparecen en CoSSMic.
+- Detección coherente en el formulario y worker: esas fechas ya no exigen una zona inventada.
+- Comparación de todas las filas de cuatro extractos reales entre UTC y hora europea: mismos instantes, completitud y energía. Bytes y hash originales conservados.
+- Offsets imposibles rechazados; -0000 queda fuera del perfil como -00:00. Sin inferir formatos regionales ambiguos.
+
 ## 0.3.1 — 2026-09-27
 
 - H1 reformulado por ausencia de participantes: recorrido interno documentado, sin atribuir resultados a usuarios.
