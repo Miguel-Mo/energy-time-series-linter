@@ -1,0 +1,83 @@
+{
+  "source": "https://data.open-power-system-data.org/household_data/2020-04-15/",
+  "download": "https://data.open-power-system-data.org/household_data/2020-04-15/household_data_60min_singleindex.csv",
+  "sourceSha256": "15956440b27465686eae2abf5895cbc3dab80f934a891bcb2f4f944428e97d60",
+  "sourceBytes": 15654559,
+  "metadataSha256": "93500241f4bb19f84f2668b100f53ec531e0c7dcbfa5d8759425c1375d588670",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "Open Power System Data. 2020. Data Package Household Data. Version 2020-04-15. Primary data: CoSSMic.",
+  "transformation": "Select rows by UTC range [start, end) and columns only. Preserve numeric strings, empty values, timestamps and the complete upstream interpolated marker. No interpolation or unit conversion added.",
+  "caveat": "Real measurements processed by the publisher, including upstream gap filling. Contadores acumulados: NO sumar como energia por intervalo. The linter does not interpret the interpolated column.",
+  "configuration": {
+    "timestampColumn": 0,
+    "valueColumn": 1,
+    "unit": "kWh",
+    "measurement": "counter",
+    "timezone": "",
+    "decimal": ".",
+    "delimiter": ",",
+    "intervalMinutes": null,
+    "intervalPosition": "start",
+    "cadenceMinutes": 60,
+    "expectedStart": null,
+    "expectedEnd": null,
+    "highValue": null,
+    "constantHours": 24,
+    "jumpFactor": 10
+  },
+  "cases": [
+    {
+      "file": "consumo-industrial.csv",
+      "column": "DE_KN_industrial1_grid_import",
+      "startInclusive": "2016-03-01",
+      "endExclusive": "2016-04-01",
+      "rows": 744,
+      "firstSourceLine": 10689,
+      "lastSourceLine": 11432,
+      "missingValues": 0,
+      "upstreamMarkedRows": 362,
+      "sha256": "92a5f528dbb0aeccc08dc9ecba3a54cea6f798175275024685e969f6b5e8f794",
+      "bytes": 140802
+    },
+    {
+      "file": "solar-industrial.csv",
+      "column": "DE_KN_industrial1_pv_1",
+      "startInclusive": "2016-03-01",
+      "endExclusive": "2016-04-01",
+      "rows": 744,
+      "firstSourceLine": 10689,
+      "lastSourceLine": 11432,
+      "missingValues": 0,
+      "upstreamMarkedRows": 256,
+      "sha256": "c2e03148606aeae9de31f49e1f800aca3cf3740003bd0d6943992662168f50dd",
+      "bytes": 139307
+    },
+    {
+      "file": "bateria-inicio-registro.csv",
+      "column": "DE_KN_industrial2_storage_charge",
+      "startInclusive": "2016-04-24",
+      "endExclusive": "2016-05-02",
+      "rows": 192,
+      "firstSourceLine": 11985,
+      "lastSourceLine": 12176,
+      "missingValues": 39,
+      "upstreamMarkedRows": 0,
+      "sha256": "8882ac6fd0ee25d7c2b1e806df3f8b3c7d89facaa744c9b7780b916988583045",
+      "bytes": 46503
+    },
+    {
+      "file": "consumo-escuela.csv",
+      "column": "DE_KN_public1_grid_import",
+      "startInclusive": "2016-06-01",
+      "endExclusive": "2016-07-01",
+      "rows": 720,
+      "firstSourceLine": 12897,
+      "lastSourceLine": 13616,
+      "missingValues": 0,
+      "upstreamMarkedRows": 171,
+      "sha256": "e9314a877650f62ed908c562df6d41a44cf94896acfc55bc99666a22a49810d4",
+      "bytes": 113358
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # H1 — Piloto de usabilidad preparado
 
-**Estado: preparado; sin participantes reclutados, sin sesiones realizadas y sin resultados de usuarios.** El propietario ha indicado que todavía no dispone de participantes ni archivos reales para este piloto. Las pruebas automatizadas no se contabilizan como sesiones.
+**Estado: preparado; sin participantes reclutados, sin sesiones realizadas y sin resultados de usuarios.** El propietario no dispone de participantes ni archivos propios. Ya hay [cuatro extractos públicos de datos reales](../examples/real/README.md), con licencia, procedencia y configuración, para practicar y preparar las sesiones. Las pruebas automatizadas no se contabilizan como sesiones.
 
 ## Objetivo y participantes
 

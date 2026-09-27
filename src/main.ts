@@ -48,6 +48,9 @@ let busy = false;
 let watchdog: ReturnType<typeof setTimeout> | undefined;
 const scrollBehavior = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' as const : 'smooth' as const;
 const labels = { error: 'Error', warning: 'Advertencia', info: 'Información' };
+const filters = document.createElement('div'); filters.className = 'finding-filters';
+filters.innerHTML = `<label>Buscar regla o descripción<input id="finding-search" type="search" placeholder="Por ejemplo, duplicado"/></label><label>Fila CSV en las muestras<input id="finding-row" type="number" min="1" step="1" placeholder="Por ejemplo, 12" aria-describedby="finding-scope"/></label><button id="clear-filters" class="quiet" type="button">Limpiar filtros</button><p id="finding-scope" class="small">La búsqueda por fila consulta solo los primeros 50 ejemplos guardados por regla, no todo el archivo. La cabecera es la fila 1.</p><p id="finding-count" class="small" aria-live="polite" aria-atomic="true"></p>`;
+el('findings').before(filters);
 const measurementLabels = { 'power-instant': 'Potencia instantánea', 'power-mean': 'Potencia media', 'interval-energy': 'Energía por intervalo', counter: 'Contador acumulado' };
 function setBusy(value: boolean) {
   busy = value; el('cancel').hidden = !value;
@@ -113,6 +116,7 @@ function makeTable(names: string[], rows: { row: number; cells: string[] }[]) {
 }
 const number = (n: number | null, suffix = '') => n === null ? 'No determinable' : `${new Intl.NumberFormat('es', { maximumFractionDigits: 4 }).format(n)}${suffix}`;
 function renderReport(r: Report) {
+  select('severity').value = 'all'; input('finding-search').value = ''; input('finding-row').value = '';
   el('results').hidden = false; el('step3').classList.add('active');
   const cards = [
     ['Registros', number(r.observed.rows), `${r.temporal.uniqueTimestamps} instantes únicos`],
@@ -142,7 +146,13 @@ function renderReport(r: Report) {
 function renderFindings() {
   if (!report) return;
   el('detail').hidden = true;
-  const findings = report.findings.filter(f => select('severity').value === 'all' || f.severity === select('severity').value);
+  const query = input('finding-search').value.trim().toLocaleLowerCase('es');
+  const row = input('finding-row').value;
+  const findings = report.findings.filter(f =>
+    (select('severity').value === 'all' || f.severity === select('severity').value) &&
+    `${f.code} ${f.description}`.toLocaleLowerCase('es').includes(query) &&
+    (!row || f.samples.some(sample => sample.rows.includes(Number(row)))));
+  el('finding-count').textContent = `${findings.length} de ${report.findings.length} reglas con hallazgos. Los filtros no cambian el informe ni el JSON.${row ? ' Coincidencias por fila limitadas a las muestras guardadas.' : ''}`;
   el('findings').replaceChildren(...findings.map(f => {
     const button = document.createElement('button'); button.className = 'finding';
     const badge = document.createElement('span'); badge.className = `badge ${f.severity}`; badge.textContent = labels[f.severity];
@@ -150,22 +160,39 @@ function renderFindings() {
     const code = document.createElement('code'); code.textContent = f.code; body.append(title, code);
     const count = document.createElement('span'); count.className = 'finding-count'; count.textContent = `${f.count} ↗`;
     button.setAttribute('aria-controls', 'detail'); button.setAttribute('aria-expanded', 'false');
-    button.append(badge, body, count); button.onclick = () => { document.querySelectorAll('.finding').forEach(b => b.setAttribute('aria-expanded', 'false')); button.setAttribute('aria-expanded', 'true'); showDetail(f); }; return button;
+    button.append(badge, body, count); button.onclick = () => { document.querySelectorAll('.finding').forEach(b => b.setAttribute('aria-expanded', 'false')); button.setAttribute('aria-expanded', 'true'); showDetail(f, button); }; return button;
   }));
-  if (!findings.length) { const p = document.createElement('p'); p.className = 'empty-state'; p.textContent = 'No hay hallazgos con esta severidad.'; el('findings').append(p); }
+  if (!findings.length) { const p = document.createElement('p'); p.className = 'empty-state'; p.textContent = 'No hay coincidencias con estos filtros. Una fila sin muestras no demuestra que esté libre de problemas.'; el('findings').append(p); }
 }
-function showDetail(f: Finding) {
+function showDetail(f: Finding, origin: HTMLButtonElement) {
   const detail = el('detail'); detail.hidden = false; detail.replaceChildren();
   detail.tabIndex = -1; detail.setAttribute('role', 'region'); detail.setAttribute('aria-label', `Detalle: ${f.code}`);
   const title = document.createElement('h3'); title.textContent = f.code; const p = document.createElement('p'); p.textContent = `${f.description} ${f.suggestion}`;
   const technical = document.createElement('p'); technical.className = 'muted small'; technical.textContent = f.technical;
-  detail.append(title, p, technical);
-  for (const sample of f.samples) {
+  const back = document.createElement('button'); back.className = 'quiet'; back.textContent = 'Volver al hallazgo';
+  back.onclick = () => { detail.hidden = true; origin.setAttribute('aria-expanded', 'false'); origin.focus(); };
+  const coverage = document.createElement('p'); coverage.className = 'guidance';
+  coverage.textContent = `${f.count} incidencias en total · ${f.samples.length} ejemplos guardados.${f.samplesTruncated ? ' Solo se guardan los primeros 50 ejemplos; no es una lista exhaustiva.' : ''}`;
+  const samples = input('finding-row').value ? f.samples.filter(sample => sample.rows.includes(Number(input('finding-row').value))) : f.samples;
+  const content = document.createElement('div'); content.id = 'sample-page';
+  const nav = document.createElement('nav'); nav.className = 'sample-pagination'; nav.setAttribute('aria-label', 'Páginas de ejemplos');
+  const previous = document.createElement('button'); previous.className = 'quiet'; previous.textContent = 'Ejemplos anteriores';
+  const next = document.createElement('button'); next.className = 'quiet'; next.textContent = 'Ejemplos siguientes';
+  const position = document.createElement('p'); position.setAttribute('aria-live', 'polite'); position.setAttribute('aria-atomic', 'true');
+  let page = 0; const pageSize = 5;
+  function renderPage() {
+    content.replaceChildren();
+    for (const sample of samples.slice(page * pageSize, (page + 1) * pageSize)) {
     const found = document.createElement('p'); found.className = 'sample-caption'; found.textContent = `Encontrado: ${sample.found}${sample.rows.length ? ` · Registros ${sample.rows.join(', ')}` : ' · Archivo completo'}`;
-    detail.append(found);
-    if (sample.rows.length) { const wrap = document.createElement('div'); wrap.className = 'table-wrap'; wrap.append(makeTable(headers, sample.rows.map((row, i) => ({ row, cells: sample.cells[i] })))); detail.append(wrap); }
+    content.append(found);
+    if (sample.rows.length) { const wrap = document.createElement('div'); wrap.className = 'table-wrap'; wrap.tabIndex = 0; wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', `Registros ${sample.rows.join(', ')}`); wrap.append(makeTable(headers, sample.rows.map((row, i) => ({ row, cells: sample.cells[i] })))); content.append(wrap); }
+    }
+    previous.disabled = page === 0; next.disabled = (page + 1) * pageSize >= samples.length;
+    position.textContent = samples.length ? `Ejemplos ${page * pageSize + 1}–${Math.min((page + 1) * pageSize, samples.length)} de ${samples.length} · Página ${page + 1} de ${Math.ceil(samples.length / pageSize)}` : 'No hay ejemplos guardados para mostrar.';
   }
-  if (f.samplesTruncated) { const p = document.createElement('p'); p.textContent = 'Se muestran los primeros 50 ejemplos; el recuento incluye todos.'; detail.append(p); }
+  previous.onclick = () => { page--; renderPage(); if (previous.disabled) next.focus(); };
+  next.onclick = () => { page++; renderPage(); if (next.disabled) previous.focus(); };
+  nav.append(previous, position, next); detail.append(back, title, p, technical, coverage, nav, content); renderPage();
   detail.focus({ preventScroll: true }); detail.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' });
 }
 select('demo').replaceChildren(...Object.entries(EXAMPLES).map(([id, e]) => new Option(e.title, id)));
@@ -182,6 +209,9 @@ el('config').onsubmit = event => {
   setBusy(true); clearReport(); status('Analizando en un proceso local. Puedes cancelar sin bloquear la página…'); worker.postMessage({ type: 'analyze', config });
 };
 select('severity').onchange = renderFindings;
+input('finding-search').oninput = renderFindings;
+input('finding-row').oninput = renderFindings;
+el('clear-filters').onclick = () => { select('severity').value = 'all'; input('finding-search').value = ''; input('finding-row').value = ''; renderFindings(); input('finding-search').focus(); };
 el('download').onclick = () => {
   if (!report) return;
   const url = URL.createObjectURL(new Blob([serializeReport(report)], { type: 'application/json' }));

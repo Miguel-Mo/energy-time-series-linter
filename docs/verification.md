@@ -1,4 +1,10 @@
-# Verificación de la entrega 0.2.0
+# Verificación de la entrega 0.3.0
+
+Actualización H4, 27 de septiembre de 2026: **72 pruebas unitarias y 18 pruebas de navegador correctas** (nueve en escritorio y nueve en emulación móvil Chromium). Build TypeScript/Vite y `docs:check` correctos. Nuevas comprobaciones: páginas inicial/final, navegación por teclado y devolución del foco, filtros combinados y limpieza, aviso de muestras truncadas, exportación con recuento íntegro aunque no haya coincidencias, axe en detalle filtrado y reflow a 320 px. Batería CoSSMic real analizada por el worker: 39 valores ausentes, 153 de 192 valores utilizables (79,6875 %). Revisión visual de detalle en escritorio y móvil sin desbordamiento de página; tablas con desplazamiento propio.
+
+Capturas H4: [escritorio](screenshots/desktop-findings.png), [móvil](screenshots/mobile-findings.png). Evidencia interna; no sustituye H1 ni revisión manual de accesibilidad.
+
+## Base anterior: entrega 0.2.0
 
 Verificación local: 27 de septiembre de 2026, Windows, Node.js 24.15.0, npm 11.13.0. Esta es evidencia de pruebas internas, no una revisión externa ni certificación.
 

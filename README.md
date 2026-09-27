@@ -62,6 +62,7 @@ La construcción usa `base: './'` y funciona tanto en dominio raíz como bajo `/
 - [Reglas y fórmulas](docs/rules.md)
 - [Formato versionado del informe](docs/report-format.md)
 - [Ejemplos](examples/README.md)
+- [Cuatro CSV de datos reales: consumo, solar y batería](examples/real/README.md)
 - [Verificación y capturas](docs/verification.md)
 - [Entrega de usabilidad 0.2.0](docs/milestones.md)
 - [Piloto de usuarios preparado, aún sin sesiones](docs/usability-pilot.md)

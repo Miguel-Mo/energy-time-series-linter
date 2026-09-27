@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 — 2026-09-27
+
+- H4: búsqueda por regla o descripción, combinada con severidad y fila CSV dentro de las muestras guardadas.
+- Detalles paginados en grupos de cinco ejemplos, recuento total separado de muestras y aviso explícito del límite de 50.
+- Vuelta al hallazgo con foco de teclado, limpieza de filtros y controles adaptados a móvil.
+- Los filtros no modifican el informe exportado; el esquema JSON sigue en 2.0.0.
+- Cuatro extractos públicos CoSSMic (CC BY 4.0), procedencia, hashes y script de reproducción; prueba de batería real en navegador.
+
 ## 0.2.0 — 2026-09-27
 
 - Ayuda según significado de la medición, campos pertinentes y unidades compatibles, sin conversiones silenciosas.

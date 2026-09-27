@@ -1,12 +1,18 @@
-# Entrega 0.2.0 — usabilidad
+# Hitos de usabilidad — entrega actual 0.3.0
 
-Alcance autorizado: siguiente entrega propuesta, H1, H2, H3 y H5. H4 y H6–H10 se conservan como trabajo posterior; no se amplía a otros formatos ni se publica automáticamente.
+La entrega 0.2.0 abordó H1, H2, H3 y H5. A petición del propietario se continúa con H4 en 0.3.0 y se incorpora un paquete público de datos reales para preparar H1. La publicación y las sesiones externas siguen pendientes.
 
 | Hito | Entrega | Estado / validación pendiente |
 | --- | --- | --- |
-| H1. Uso real | Protocolo, tareas, respuestas para moderación y plantilla anónima | Preparado. Faltan participantes y sesiones reales; no está completado. |
+| H1. Uso real | Protocolo, tareas, plantilla anónima y cuatro extractos públicos CoSSMic con licencia y hashes | Preparado y probado técnicamente. Faltan participantes y sesiones reales; no está completado. |
 | H2. Configuración guiada | Ayuda por tipo, duración/cadencia separadas, campos pertinentes, unidades compatibles, errores enlazados antes de analizar | Implementado; cubierto por pruebas de navegador. |
 | H3. Interpretación del resumen | Presencia temporal, valores interpretables y duplicados separados; periodo esperado explícito; causas de energía no determinable | Implementado; casos deterministas y pruebas de interfaz. |
+| H4. Navegación de hallazgos | Búsqueda por regla/descripción, filtro por fila en muestras, páginas de cinco ejemplos, vuelta con foco y limpieza de filtros | Implementado en 0.3.0. Se conserva el límite de 50 muestras por regla; la búsqueda por fila no cubre registros fuera de esas muestras. Pruebas de teclado, exportación, móvil y batería real. |
 | H5. Accesibilidad | Texto y contraste, controles táctiles, enlace de salto, foco y teclado, errores asociados, movimiento reducido, auditoría axe | Mejoras implementadas; la evaluación manual con lectores de pantalla y usuarios sigue pendiente. No es una declaración de conformidad WCAG. |
+| H6. Formatos reales | Ampliar compatibilidad usando exportaciones documentadas, sin conversiones silenciosas | Pendiente. Base disponible: cuatro CSV CoSSMic; todavía no representa variedad de proveedores. |
+| H7. Guía temporal | Ayuda contextual para offsets, horas locales y cambios de horario | Ayuda básica disponible; profundización pendiente. |
+| H8. Reproducibilidad y navegadores | Ampliar pruebas fuera de Chromium y documentar diferencias temporales | Pendiente; móvil actual es emulación Chromium. |
+| H9. Portabilidad del informe | Facilitar compartir e interpretar el informe fuera de la aplicación | JSON versionado disponible; ampliación pendiente. |
+| H10. Beta pública | Preparar publicación, documentación y canal de incidencias | Pendiente; sin despliegue público. |
 
-El informe pasa a 2.0.0 porque cambia la semántica de configuración y completitud. La aplicación pasa a 0.2.0. La privacidad, el archivo original y el procesamiento local se conservan.
+El informe pasó a 2.0.0 con el cambio de semántica de configuración y completitud en la app 0.2.0. La app 0.3.0 conserva ese esquema: los filtros y la paginación solo afectan a la presentación. La privacidad, el archivo original y el procesamiento local se conservan.
