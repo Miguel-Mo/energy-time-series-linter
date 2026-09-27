@@ -1,4 +1,12 @@
-# Verificación de la entrega 0.3.0
+# Verificación de la entrega 0.3.1
+
+H1 interno reformulado: **72 pruebas unitarias y 26 casos de navegador verificados** en total. La ejecución completa pasó 24 de 26 inicialmente tras la corrección de la vista previa; los dos restantes fallaron por usar la tecla End en lugar de ArrowRight para comprobar scroll horizontal. Corregida esa acción de prueba, se repitieron los ocho recorridos H1. Los resultados definitivos y las limitaciones están documentados en [H1 interno](h1-internal-evaluation.md). Build y catálogo correctos; el build avisa de JS superior a 500 kB al incluir los ejemplos sin conexión (856 kB, 159 kB gzip).
+
+Los nuevos recorridos cubren los cuatro ejemplos reales en escritorio y móvil, sin conexión, confirmación obligatoria, descarga con hash del extracto, recuentos y limpieza de sugerencias al cargar otro archivo. La auditoría axe detectó originalmente una vista previa ancha sin acceso por teclado: corregida como región nombrada y enfocable, con comprobación de desplazamiento y repetición de axe. Esta evidencia corresponde a revisión interna asistida por IA, no a sesiones humanas.
+
+## Base anterior: entrega 0.3.0
+
+Capturas revisadas de H1 0.3.1: [ejemplo real en escritorio](screenshots/desktop-real-guidance.png), [ejemplo real en móvil](screenshots/mobile-real-guidance.png).
 
 Actualización H4, 27 de septiembre de 2026: **72 pruebas unitarias y 18 pruebas de navegador correctas** (nueve en escritorio y nueve en emulación móvil Chromium). Build TypeScript/Vite y `docs:check` correctos. Nuevas comprobaciones: páginas inicial/final, navegación por teclado y devolución del foco, filtros combinados y limpieza, aviso de muestras truncadas, exportación con recuento íntegro aunque no haya coincidencias, axe en detalle filtrado y reflow a 320 px. Batería CoSSMic real analizada por el worker: 39 valores ausentes, 153 de 192 valores utilizables (79,6875 %). Revisión visual de detalle en escritorio y móvil sin desbordamiento de página; tablas con desplazamiento propio.
 

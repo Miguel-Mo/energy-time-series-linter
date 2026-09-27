@@ -1,5 +1,6 @@
 import AnalyzerWorker from './worker?worker&inline';
 import { EXAMPLES } from './examples';
+import { REAL_EXAMPLES } from './real-examples';
 import { serializeReport } from './analyze';
 import { APP_VERSION, MAX_BYTES, type Config, type Detection, type Report, type Finding } from './types';
 import './style.css';
@@ -45,6 +46,15 @@ let worker: Worker;
 let report: Report | null = null;
 let headers: string[] = [];
 let busy = false;
+let realExample: string | null = null;
+const exampleHelp = document.createElement('p'); exampleHelp.id = 'example-help'; exampleHelp.className = 'guidance'; exampleHelp.hidden = true;
+el('preview').tabIndex = 0; el('preview').setAttribute('role', 'region'); el('preview').setAttribute('aria-label', 'Vista previa del CSV, desplazable');
+el('setup').querySelector('.workspace')!.before(exampleHelp);
+const exportHelp = document.createElement('p'); exportHelp.className = 'guidance'; exportHelp.id = 'export-help';
+exportHelp.textContent = 'El JSON incluye el nombre y hash del archivo, la configuración y muestras de celdas. Se descarga en tu dispositivo; no se envía automáticamente. Revisa su contenido antes de compartirlo.';
+el('results').querySelector('.section-heading')!.after(exportHelp);
+el('download').setAttribute('aria-describedby', 'export-help');
+document.querySelector('.privacy')!.textContent = 'Tu archivo se procesa en este dispositivo y no se sube a ningún servidor.';
 let watchdog: ReturnType<typeof setTimeout> | undefined;
 const scrollBehavior = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' as const : 'smooth' as const;
 const labels = { error: 'Error', warning: 'Advertencia', info: 'Información' };
@@ -84,6 +94,9 @@ function startWorker(silent = false) {
       select('decimal').value = detection.decimal ?? ''; select('delimiter').value = detection.delimiter === '\t' ? 'tab' : detection.delimiter;
       input('confirm').checked = false;
       clearErrors(); setLocalColumns(data.localColumns);
+      if (realExample) {
+        select('timestamp').value = '0'; select('value').value = '1'; select('measurement').value = 'counter'; select('unit').value = 'kWh'; select('decimal').value = '.'; input('cadence').value = '60'; syncGuidance();
+      }
       el('preview').replaceChildren(makeTable(headers, data.preview.map((cells: string[], i: number) => ({ row: i + 2, cells }))));
       status(`Archivo leído localmente. ${data.rows} registros. Revisa y confirma la configuración.`);
     } else if (data.type === 'report') {
@@ -96,8 +109,13 @@ function startWorker(silent = false) {
 function cancel(message = 'Análisis cancelado. Puedes cargar otro archivo.') {
   worker.terminate(); setBusy(false); clearReport(); el('setup').hidden = true; input('file').value = ''; startWorker(true); status(message);
 }
-function load(file: File) {
+function load(file: File, example: string | null = null) {
   if (busy) return;
+  realExample = example; exampleHelp.hidden = !example; exampleHelp.replaceChildren();
+  if (example) {
+    const note = document.createElement('span'); note.textContent = `${REAL_EXAMPLES[example].task} Configuración sugerida según la fuente: columna UTC, segunda columna de valores, contador acumulado en kWh y cadencia de 60 minutos. Revísala antes de analizar. Datos CoSSMic / Open Power System Data, versión 2020-04-15, CC BY 4.0. La fuente rellenó algunos huecos; conservamos sus marcadores, que el analizador no interpreta. `;
+    const link = document.createElement('a'); link.href = 'https://data.open-power-system-data.org/household_data/2020-04-15/'; link.textContent = 'Procedencia y licencia'; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.style.textDecoration = 'underline'; exampleHelp.append(note, link);
+  }
   clearReport(); el('setup').hidden = true;
   if (file.size > MAX_BYTES) { status('El límite del MVP es 10 MiB. Selecciona un archivo más pequeño.'); return; }
   // A fresh inline worker also discards all previous file data without storage or a network request.
@@ -196,8 +214,10 @@ function showDetail(f: Finding, origin: HTMLButtonElement) {
   detail.focus({ preventScroll: true }); detail.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' });
 }
 select('demo').replaceChildren(...Object.entries(EXAMPLES).map(([id, e]) => new Option(e.title, id)));
+const realGroup = document.createElement('optgroup'); realGroup.label = 'Datos reales · CoSSMic · CC BY 4.0';
+realGroup.append(...Object.entries(REAL_EXAMPLES).map(([id, e]) => new Option(e.title, `real:${id}`))); select('demo').append(realGroup);
 input('file').onchange = () => { const file = input('file').files?.[0]; if (file) load(file); input('file').value = ''; };
-el('load-demo').onclick = () => { const id = select('demo').value; load(new File([EXAMPLES[id].text], `${id}.csv`, { type: 'text/csv' })); };
+el('load-demo').onclick = () => { const selected = select('demo').value; const real = selected.startsWith('real:'); const id = real ? selected.slice(5) : selected; load(new File([(real ? REAL_EXAMPLES : EXAMPLES)[id].text], `${id}.csv`, { type: 'text/csv' }), real ? id : null); };
 el('cancel').onclick = () => cancel();
 el('config').addEventListener('input', () => { clearReport(); input('confirm').checked = false; clearErrors(); syncGuidance(); });
 // Checkbox input must retain the user's choice; other edits revoke confirmation.

@@ -1,10 +1,10 @@
-# Hitos de usabilidad — entrega actual 0.3.0
+# Hitos de usabilidad — entrega actual 0.3.1
 
-La entrega 0.2.0 abordó H1, H2, H3 y H5. A petición del propietario se continúa con H4 en 0.3.0 y se incorpora un paquete público de datos reales para preparar H1. La publicación y las sesiones externas siguen pendientes.
+La entrega 0.2.0 abordó H1, H2, H3 y H5; 0.3.0 añadió H4. En 0.3.1, ante la decisión del propietario de no disponer de participantes, H1 se reformula y se cierra mediante evaluación interna documentada. La validación con usuarios no se ha realizado y deja de ser requisito bloqueante; la publicación sigue pendiente.
 
 | Hito | Entrega | Estado / validación pendiente |
 | --- | --- | --- |
-| H1. Uso real | Protocolo, tareas, plantilla anónima y cuatro extractos públicos CoSSMic con licencia y hashes | Preparado y probado técnicamente. Faltan participantes y sesiones reales; no está completado. |
+| H1. Evaluación interna con datos reales (alcance reformulado) | [Recorrido documentado](h1-internal-evaluation.md), cuatro ejemplos guiados incorporados, comprobaciones reproducibles y mejoras derivadas | Cerrado para el alcance interno por decisión de no disponer de participantes. No es validación con usuarios; el piloto humano deja de ser un requisito bloqueante. |
 | H2. Configuración guiada | Ayuda por tipo, duración/cadencia separadas, campos pertinentes, unidades compatibles, errores enlazados antes de analizar | Implementado; cubierto por pruebas de navegador. |
 | H3. Interpretación del resumen | Presencia temporal, valores interpretables y duplicados separados; periodo esperado explícito; causas de energía no determinable | Implementado; casos deterministas y pruebas de interfaz. |
 | H4. Navegación de hallazgos | Búsqueda por regla/descripción, filtro por fila en muestras, páginas de cinco ejemplos, vuelta con foco y limpieza de filtros | Implementado en 0.3.0. Se conserva el límite de 50 muestras por regla; la búsqueda por fila no cubre registros fuera de esas muestras. Pruebas de teclado, exportación, móvil y batería real. |

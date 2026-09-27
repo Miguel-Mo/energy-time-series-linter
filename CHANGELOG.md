@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1 — 2026-09-27
+
+- H1 reformulado por ausencia de participantes: recorrido interno documentado, sin atribuir resultados a usuarios.
+- Cuatro ejemplos CoSSMic incluidos sin conexión, con tareas, procedencia y configuración sugerida que exige revisión y confirmación.
+- Explicación del contenido del JSON junto a la descarga y mensaje de privacidad en español.
+- Corrección detectada durante la revisión: vista previa ancha enfocable y desplazable con teclado.
+- Ocho recorridos automatizados de datos reales (cuatro casos en escritorio y móvil), con exportación, hashes y ausencia de configuración heredada al cargar archivos desconocidos.
+
 ## 0.3.0 — 2026-09-27
 
 - H4: búsqueda por regla o descripción, combinada con severidad y fila CSV dentro de las muestras guardadas.

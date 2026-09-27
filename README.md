@@ -65,7 +65,8 @@ La construcción usa `base: './'` y funciona tanto en dominio raíz como bajo `/
 - [Cuatro CSV de datos reales: consumo, solar y batería](examples/real/README.md)
 - [Verificación y capturas](docs/verification.md)
 - [Entrega de usabilidad 0.2.0](docs/milestones.md)
-- [Piloto de usuarios preparado, aún sin sesiones](docs/usability-pilot.md)
+- [H1: evaluación interna sin participantes y guía de prueba](docs/h1-internal-evaluation.md)
+- [Protocolo opcional de futuras sesiones](docs/usability-pilot.md)
 
 Arquitectura: `csv.ts` interpreta CSV y números; `time.ts` interpreta instantes; `analyze.ts` ejecuta reglas puras; `worker.ts` mantiene datos y hash fuera del hilo de interfaz; `main.ts` presenta los resultados. `rules.ts` es el catálogo que genera `docs/rules.md`. Sin framework de interfaz. Las versiones exactas de dependencias están fijadas en `package.json` y `package-lock.json`.
 

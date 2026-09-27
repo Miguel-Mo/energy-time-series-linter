@@ -1,4 +1,6 @@
-# H1 — Piloto de usabilidad preparado
+# Piloto opcional — protocolo histórico
+
+El propietario ha confirmado que no habrá participantes. H1 se reformula como [evaluación interna sin participantes](h1-internal-evaluation.md); este protocolo se conserva como recurso opcional, sin bloquear los hitos. Los requisitos de cierre al final de este documento se refieren exclusivamente al piloto humano original.
 
 **Estado: preparado; sin participantes reclutados, sin sesiones realizadas y sin resultados de usuarios.** El propietario no dispone de participantes ni archivos propios. Ya hay [cuatro extractos públicos de datos reales](../examples/real/README.md), con licencia, procedencia y configuración, para practicar y preparar las sesiones. Las pruebas automatizadas no se contabilizan como sesiones.
 
