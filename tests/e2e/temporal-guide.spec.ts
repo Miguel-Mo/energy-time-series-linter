@@ -1,0 +1,29 @@
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+test('timezone guidance follows offsets in the selected time column, including later rows', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#file').setInputFiles({ name: 'split.csv', mimeType: 'text/csv', buffer: Buffer.from('Date;Time;LocalTime;power_kW\n27/10/2024;02:30:00+0200;02:30:00+0200;2\n27/10/2024;02:30:00+0100;02:30:00;2') });
+  await expect(page.getByRole('status')).toContainText('Archivo leído');
+  await page.locator('#date-format').selectOption('dmy'); await page.locator('#time-column').selectOption('1');
+  await expect(page.locator('#timezone')).not.toHaveAttribute('required', '');
+  await expect(page.locator('#timezone-help')).toContainText('Opcional');
+  await page.locator('#time-column').selectOption('2');
+  await expect(page.locator('#timezone')).toHaveAttribute('required', '');
+  await expect(page.locator('#timezone-help')).toContainText('fechas locales');
+});
+test('ambiguous local time links to actionable guidance without changing the data', async ({ page, context }, testInfo) => {
+  await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo'); await context.setOffline(true);
+  await page.locator('#file').setInputFiles({ name: 'autumn-local.csv', mimeType: 'text/csv', buffer: Buffer.from('timestamp,power_kW\n2024-10-27T02:30:00,2\n2024-10-27T03:30:00,2') });
+  await expect(page.getByRole('status')).toContainText('Archivo leído');
+  await page.getByLabel('Tipo de medición').selectOption('power-instant'); await page.locator('#timezone').fill('Europe/Madrid');
+  await page.getByLabel('He revisado').check(); await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await page.getByRole('button', { name: /TS_LOCAL_AMBIGUOUS/ }).click();
+  await page.getByRole('button', { name: 'Consultar la guía de zonas y cambios de hora' }).click();
+  await expect(page.locator('#temporal-guide summary')).toBeFocused();
+  await expect(page.locator('#temporal-guide')).toContainText('No añadas Z ni un offset inventado');
+  await expect(page.locator('#energy-total')).toHaveText('No determinable');
+  await expect(page.locator('#timezone')).toHaveValue('Europe/Madrid');
+  await expect(page.locator('#confirm')).toBeChecked();
+  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
+  await page.locator('#temporal-guide').screenshot({ path: testInfo.outputPath('temporal-guide.png'), scale: 'css' });
+});

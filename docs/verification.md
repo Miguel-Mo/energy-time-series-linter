@@ -1,4 +1,8 @@
-# Verificación de la entrega 0.5.0
+# Verificación de la entrega 0.6.0
+
+H7, 28 de septiembre de 2026: **93 pruebas unitarias y 34 pruebas de navegador correctas**, build y catálogo correctos. Ejecución final: `npx playwright test --workers=2`, cierre limpio en 56,2 s. Una ejecución anterior con seis procesos completó las comprobaciones pero quedó abierta al terminar y se interrumpió; no se utiliza como evidencia de cierre. Guía abierta desde hallazgos temporales, foco, conservación de datos/resultados y axe comprobados en escritorio y móvil. La detección de zona comprueba columnas temporales mixtas, regionales y separadas. Capturas inspeccionadas en [guía H7](temporal-guidance.md).
+
+## Base anterior: entrega 0.5.0
 
 H6, corpus inicial completado: **93 pruebas unitarias y 30 pruebas de navegador correctas**. Build TypeScript/Vite y catálogo correctos. El segundo conjunto público, UCI, comprueba fechas regionales elegidas explícitamente y hora separada: 1440 medias por minuto y 56,5076666667 kWh contrastados con Decimal de Python. En escritorio y móvil se verificaron importación sin conexión, corrección de columnas incompatibles, exportación de las decisiones y restablecimiento al cargar otro ejemplo. Se mantienen rechazos de calendario imposible y horas locales ambiguas/inexistentes. Las hipótesis de zona y posición del intervalo aparecen en la interfaz y la documentación.
 

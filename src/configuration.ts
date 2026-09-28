@@ -18,7 +18,7 @@ export function syncGuidance() {
     get(id).closest('label')!.hidden = !isInterval(type);
   }
   get('interval').required = isInterval(type);
-  const local = localColumns.includes(Number(get('timestamp').value)) || get('date-format').value !== 'iso' || get('time-column').value !== '';
+  const local = localColumns.includes(Number(get('time-column').value === '' ? get('timestamp').value : get('time-column').value));
   get('timezone').required = local;
   document.getElementById('timezone-help')!.textContent = local
     ? 'El archivo contiene fechas locales en esta columna: indica la zona del equipo. No usamos la zona del navegador.'

@@ -1,6 +1,7 @@
 import AnalyzerWorker from './worker?worker&inline';
 import { EXAMPLES } from './examples';
 import { REAL_EXAMPLES } from './real-examples';
+import { installTemporalGuide, openTemporalGuide } from './temporal-guide';
 import { serializeReport } from './analyze';
 import { APP_VERSION, MAX_BYTES, type Config, type Detection, type Report, type Finding } from './types';
 import './style.css';
@@ -220,6 +221,9 @@ function showDetail(f: Finding, origin: HTMLButtonElement) {
   previous.onclick = () => { page--; renderPage(); if (previous.disabled) next.focus(); };
   next.onclick = () => { page++; renderPage(); if (next.disabled) previous.focus(); };
   nav.append(previous, position, next); detail.append(back, title, p, technical, coverage, nav, content); renderPage();
+  if (['TS_ZONE_REQUIRED', 'TS_LOCAL_AMBIGUOUS', 'TS_MIXED_ZONE', 'TS_OFFSET_CHANGE', 'TS_ZONE_MISMATCH'].includes(f.code)) {
+    const help = document.createElement('button'); help.type = 'button'; help.className = 'quiet'; help.textContent = 'Consultar la guía de zonas y cambios de hora'; help.onclick = openTemporalGuide; technical.after(help);
+  }
   detail.focus({ preventScroll: true }); detail.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' });
 }
 select('demo').replaceChildren(...Object.entries(EXAMPLES).map(([id, e]) => new Option(e.title, id)));
@@ -246,4 +250,4 @@ el('download').onclick = () => {
   const url = URL.createObjectURL(new Blob([serializeReport(report)], { type: 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = 'energy-time-series-report.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
-initializeForm(); startWorker();
+installTemporalGuide(); initializeForm(); startWorker();

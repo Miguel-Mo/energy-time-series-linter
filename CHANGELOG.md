@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 — 2026-09-28
+
+- H7: guía en la configuración sobre UTC, offsets, zonas IANA y cambios horarios, enlazada desde hallazgos relevantes.
+- Ejemplos históricos de Europe/Madrid y pasos para solicitar timestamps inequívocos al origen, sin inventar offsets.
+- La guía no modifica datos, configuración, confirmación ni resultados. Funciona sin conexión y recibe foco desde el hallazgo.
+- Corregida la exigencia de zona para fechas regionales y hora separada: se examina si la columna seleccionada contiene valores locales, sin exigir zona cuando ya hay offset.
+
 ## 0.5.0 — 2026-09-27
 
 - H6: selección explícita día/mes/año o mes/día/año, y columna de hora separada. ISO permanece como opción inicial, sin adivinar fechas ambiguas.
