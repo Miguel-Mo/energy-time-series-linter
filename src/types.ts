@@ -1,4 +1,4 @@
-export const APP_VERSION = '0.4.0';
+export const APP_VERSION = '0.5.0';
 export const MAX_BYTES = 10 * 1024 * 1024;
 export const MAX_ROWS = 100_000;
 export const MAX_COLUMNS = 100;
@@ -6,6 +6,7 @@ export type Severity = 'error' | 'warning' | 'info';
 export type Measurement = 'power-instant' | 'power-mean' | 'interval-energy' | 'counter';
 export type Unit = 'W' | 'kW' | 'MW' | 'Wh' | 'kWh' | 'MWh';
 export interface Config {
+  dateFormat?: 'iso' | 'dmy' | 'mdy'; timeColumn?: number | null;
   timestampColumn: number; valueColumn: number; unit: Unit; measurement: Measurement;
   timezone: string; decimal: '.' | ','; delimiter: string;
   intervalMinutes: number | null; intervalPosition: 'start' | 'end';

@@ -18,7 +18,7 @@ export function syncGuidance() {
     get(id).closest('label')!.hidden = !isInterval(type);
   }
   get('interval').required = isInterval(type);
-  const local = localColumns.includes(Number(get('timestamp').value));
+  const local = localColumns.includes(Number(get('timestamp').value)) || get('date-format').value !== 'iso' || get('time-column').value !== '';
   get('timezone').required = local;
   document.getElementById('timezone-help')!.textContent = local
     ? 'El archivo contiene fechas locales en esta columna: indica la zona del equipo. No usamos la zona del navegador.'
@@ -31,6 +31,7 @@ export function collectConfig(): Config {
   const optional = (id: string) => get(id).value === '' ? null : Number(get(id).value);
   const type = get('measurement').value as Measurement;
   return {
+    dateFormat: get('date-format').value as Config['dateFormat'], timeColumn: get('time-column').value === '' ? null : Number(get('time-column').value),
     timestampColumn: Number(get('timestamp').value), valueColumn: Number(get('value').value),
     unit: get('unit').value as Config['unit'], measurement: type, timezone: get('timezone').value.trim(),
     decimal: get('decimal').value as Config['decimal'], delimiter: get('delimiter').value === 'tab' ? '\t' : get('delimiter').value,
@@ -52,6 +53,7 @@ export function checkForm(): boolean {
   if (!c.unit) errors.unit = 'Selecciona la unidad del archivo.';
   else if (c.measurement && (c.measurement.startsWith('power') ? c.unit.endsWith('h') : !c.unit.endsWith('h'))) errors.unit = 'Esta unidad no corresponde al tipo de medición elegido.';
   if (c.timestampColumn === c.valueColumn) errors.value = 'Elige una columna distinta de la fecha y hora.';
+  if (c.timeColumn != null && [c.timestampColumn, c.valueColumn].includes(c.timeColumn)) errors['time-column'] = 'La hora separada necesita una columna distinta de fecha y valor.';
   if (!c.decimal) errors.decimal = 'Confirma el separador decimal del archivo.';
   if (get('timezone').required && !c.timezone) errors.timezone = 'Estas fechas necesitan la zona del equipo, por ejemplo Europe/Madrid.';
   else if (c.timezone && !validZone(c.timezone)) errors.timezone = 'No reconocemos esa zona. Usa un identificador como Europe/Madrid o UTC.';

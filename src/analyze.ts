@@ -1,9 +1,11 @@
 import { parseNumber } from './csv';
 import { RULES, type RuleCode } from './rules';
-import { parseTime, validZone } from './time';
+import { parseTime, parseRowTime, validZone } from './time';
 import { APP_VERSION, type Config, type CsvData, type Finding, type Report } from './types';
 
 export function validateConfig(c: Config, data: CsvData) {
+  if (!['iso', 'dmy', 'mdy'].includes(c.dateFormat ?? 'iso')) throw new Error('Selecciona un formato de fecha.');
+  if (c.timeColumn != null && (!Number.isInteger(c.timeColumn) || c.timeColumn < 0 || c.timeColumn >= data.headers.length || [c.timestampColumn, c.valueColumn].includes(c.timeColumn))) throw new Error('La columna de hora debe existir y ser distinta de fecha y valor.');
   for (const index of [c.timestampColumn, c.valueColumn]) {
     if (!Number.isInteger(index) || index < 0 || index >= Math.max(2, data.headers.length)) throw new Error('Selecciona columnas existentes.');
   }
@@ -53,7 +55,7 @@ export function analyze(data: CsvData, c: Config, file: Report['file']): Report 
   if (!unitOk) add('ENERGY_UNIT', [], `${c.measurement} / ${c.unit}`);
   const times = data.rows.map((row, i) => {
     if (row.length !== data.headers.length) add('CSV_COLUMN_COUNT', [i + 2], `${row.length} / ${data.headers.length}`);
-    const parsed = parseTime(row[c.timestampColumn] ?? '', c.timezone);
+    const parsed = parseRowTime(row, c);
     if (parsed.issue) add(parsed.issue, [i + 2], row[c.timestampColumn] ?? '');
     if (parsed.mismatch) add('TS_ZONE_MISMATCH', [i + 2], row[c.timestampColumn]);
     return parsed;

@@ -1,5 +1,22 @@
 import { Temporal } from '@js-temporal/polyfill';
 import type { RuleCode } from './rules';
+import type { Config } from './types';
+export function parseRowTime(row: string[], config: Config): ParsedTime {
+  const date = (row[config.timestampColumn] ?? '').trim();
+  const time = config.timeColumn == null ? null : (row[config.timeColumn] ?? '').trim();
+  if (!date || time === '') return { ms: null, offset: null, local: true, format: '', mismatch: false, issue: 'TS_MISSING' };
+  let text = time === null ? date : `${date}T${time}`;
+  const format = config.dateFormat ?? 'iso';
+  if (format !== 'iso') {
+    const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})([Tt ].+)$/);
+    if (!match) return { ms: null, offset: null, local: true, format, mismatch: false, issue: 'TS_UNSUPPORTED' };
+    const day = format === 'dmy' ? match[1] : match[2];
+    const month = format === 'dmy' ? match[2] : match[1];
+    text = `${match[3]}-${month.padStart(2, '0')}-${day.padStart(2, '0')}${match[4]}`;
+  }
+  const parsed = parseTime(text, config.timezone);
+  return { ...parsed, format: `${format === 'iso' ? '' : format + ' / '}${parsed.format}` };
+}
 export interface ParsedTime { ms: number | null; offset: string | null; local: boolean; format: string; mismatch: boolean; issue?: RuleCode }
 export function validZone(zone: string): boolean {
   try { Temporal.Instant.from('2024-01-01T00:00:00Z').toZonedDateTimeISO(zone); return true; } catch { return false; }

@@ -1,4 +1,10 @@
-# Verificación de la entrega 0.4.0
+# Verificación de la entrega 0.5.0
+
+H6, corpus inicial completado: **93 pruebas unitarias y 30 pruebas de navegador correctas**. Build TypeScript/Vite y catálogo correctos. El segundo conjunto público, UCI, comprueba fechas regionales elegidas explícitamente y hora separada: 1440 medias por minuto y 56,5076666667 kWh contrastados con Decimal de Python. En escritorio y móvil se verificaron importación sin conexión, corrección de columnas incompatibles, exportación de las decisiones y restablecimiento al cargar otro ejemplo. Se mantienen rechazos de calendario imposible y horas locales ambiguas/inexistentes. Las hipótesis de zona y posición del intervalo aparecen en la interfaz y la documentación.
+
+El CSV UCI conserva sus bytes y saltos de línea publicados; Git tiene desactivada su normalización textual para conservar el hash tras clonar. El paquete incluye cinco ejemplos reales sin conexión: aproximadamente 956 kB de JS, 179 kB gzip; Vite mantiene su aviso de tamaño. Evidencia interna, sin validación con participantes ni dispositivos físicos.
+
+## Base anterior: entrega 0.4.0
 
 H6, primera entrega: **85 pruebas unitarias y 28 pruebas de navegador correctas**, build TypeScript/Vite correcto. Todas las filas de cuatro extractos públicos se verifican entre UTC y la columna europea con offset compacto. En escritorio y móvil se repite el flujo solar con ambas columnas, sin zona obligatoria, conservando hash y obteniendo idénticas métricas de energía y completitud. [Alcance de formatos](real-format-compatibility.md). Persiste el aviso de tamaño del paquete que incluye ejemplos locales.
 

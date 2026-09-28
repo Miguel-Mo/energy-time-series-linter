@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 — 2026-09-27
+
+- H6: selección explícita día/mes/año o mes/día/año, y columna de hora separada. ISO permanece como opción inicial, sin adivinar fechas ambiguas.
+- Segundo conjunto público: UCI (Hebrail/Berard), 1440 medias de potencia por minuto, con licencia, hashes, reproducción e hipótesis temporales declaradas.
+- Ejemplo UCI integrado sin conexión; total contrastado con cálculo independiente Decimal de Python.
+- Configuración JSON ampliada con dateFormat/timeColumn opcionales; archivos y celdas originales conservados.
+
 ## 0.4.0 — 2026-09-27
 
 - H6, primera entrega: soporte de offsets compactos como +0100/+0200 en fechas del perfil admitido, tal como aparecen en CoSSMic.

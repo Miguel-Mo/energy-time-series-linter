@@ -1,0 +1,20 @@
+import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+test('UCI split-date import, correction and export work offline', async ({ page, context }, testInfo) => {
+  await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo'); await context.setOffline(true);
+  await page.getByLabel('Archivo de ejemplo').selectOption('real:uci-household'); await page.getByRole('button', { name: 'Probar ejemplo' }).click();
+  await expect(page.getByRole('status')).toContainText('Archivo leído');
+  await expect(page.locator('#example-help')).toContainText('la fuente no declara la zona');
+  await page.locator('#time-column').selectOption('2'); await page.getByLabel('He revisado').check(); await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await expect(page.locator('#form-errors')).toContainText('columna distinta');
+  await page.locator('#time-column').selectOption('1'); await page.getByLabel('He revisado').check(); await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await expect(page.locator('#energy-total')).toContainText('56,5077 kWh');
+  await page.locator('#setup').screenshot({ path: testInfo.outputPath('uci-configuration.png'), scale: 'css' });
+  const downloading = page.waitForEvent('download'); await page.getByRole('button', { name: 'Descargar JSON' }).click();
+  const download = await downloading; const report = JSON.parse(await readFile((await download.path())!, 'utf8'));
+  expect(report.configuration.dateFormat).toBe('dmy'); expect(report.configuration.timeColumn).toBe(1);
+  expect(report.observed.rows).toBe(1440);
+  await page.getByLabel('Archivo de ejemplo').selectOption('correct-15min'); await page.getByRole('button', { name: 'Probar ejemplo' }).click();
+  await expect(page.getByRole('status')).toContainText('Archivo leído');
+  await expect(page.locator('#date-format')).toHaveValue('iso'); await expect(page.locator('#time-column')).toHaveValue('');
+});

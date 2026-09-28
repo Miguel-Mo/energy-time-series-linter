@@ -18,6 +18,8 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <div class="workspace"><div class="panel preview-panel"><div class="panel-title"><h3>Vista previa</h3><span>Primeros 8 registros</span></div><div id="preview" class="table-wrap"></div><p class="table-note">Se conserva el orden original. Los números de fila son registros CSV, incluida la cabecera.</p><div class="principle"><span aria-hidden="true">↳</span><p>Tu archivo permanece intacto.<br><span>No rellenamos huecos ni corregimos datos.</span></p></div></div>
       <form id="config" class="panel config-panel" novalidate><h3>Revisa las opciones sugeridas</h3><p class="muted small">La cabecera puede sugerir la unidad. El significado de la medición debes confirmarlo tú.</p><div id="form-errors" class="error-summary" tabindex="-1" hidden></div><div class="form-grid">
         <label>Columna de fecha y hora<select id="timestamp" required></select></label><label>Columna de valores<select id="value" required></select></label>
+        <label>Formato de fecha<select id="date-format"><option value="iso">Año-mes-día (ISO)</option><option value="dmy">Día/mes/año</option><option value="mdy">Mes/día/año</option></select><span class="hint">Elige el orden documentado por el origen. No lo adivinamos. Los límites del periodo esperado siguen usando ISO.</span></label>
+        <label>Columna de hora separada<select id="time-column"><option value="">Ya está en la columna de fecha</option></select><span class="hint">Solo si el CSV guarda fecha y hora en columnas distintas. Se conservan ambas celdas originales.</span></label>
         <label>Tipo de medición<select id="measurement" required><option value="">Selecciona el tipo…</option><option value="power-instant">Potencia instantánea</option><option value="power-mean">Potencia media por intervalo</option><option value="interval-energy">Energía por intervalo</option><option value="counter">Contador acumulado</option></select></label>
         <label>Unidad<select id="unit" aria-label="Unidad" required><option value="">Selecciona…</option><option>W</option><option>kW</option><option>MW</option><option>Wh</option><option>kWh</option><option>MWh</option></select></label>
         <p id="measurement-help" class="wide guidance" aria-live="polite"></p>
@@ -90,12 +92,17 @@ function startWorker(silent = false) {
         else if (headers.length === 1 && id === 'value') select(id).append(new Option('(falta columna de valores)', '1'));
       }
       select('timestamp').value = String(detection.timestampColumn); select('value').value = String(detection.valueColumn);
+      select('time-column').replaceChildren(new Option('Ya está en la columna de fecha', ''), ...headers.map((h, i) => new Option(`${i + 1}. ${h.slice(0, 80)}`, String(i))));
+      select('date-format').value = 'iso';
       select('unit').value = detection.unit ?? ''; select('measurement').value = detection.measurement ?? '';
       select('decimal').value = detection.decimal ?? ''; select('delimiter').value = detection.delimiter === '\t' ? 'tab' : detection.delimiter;
       input('confirm').checked = false;
       clearErrors(); setLocalColumns(data.localColumns);
       if (realExample) {
         select('timestamp').value = '0'; select('value').value = '1'; select('measurement').value = 'counter'; select('unit').value = 'kWh'; select('decimal').value = '.'; input('cadence').value = '60'; syncGuidance();
+        if (realExample === 'uci-household') {
+          select('value').value = '2'; select('date-format').value = 'dmy'; select('time-column').value = '1'; select('measurement').value = 'power-mean'; select('unit').value = 'kW'; input('interval').value = '1'; input('cadence').value = '1'; input('timezone').value = 'Europe/Paris'; syncGuidance();
+        }
       }
       el('preview').replaceChildren(makeTable(headers, data.preview.map((cells: string[], i: number) => ({ row: i + 2, cells }))));
       status(`Archivo leído localmente. ${data.rows} registros. Revisa y confirma la configuración.`);
@@ -114,7 +121,9 @@ function load(file: File, example: string | null = null) {
   realExample = example; exampleHelp.hidden = !example; exampleHelp.replaceChildren();
   if (example) {
     const note = document.createElement('span'); note.textContent = `${REAL_EXAMPLES[example].task} Configuración sugerida según la fuente: columna UTC, segunda columna de valores, contador acumulado en kWh y cadencia de 60 minutos. Revísala antes de analizar. Datos CoSSMic / Open Power System Data, versión 2020-04-15, CC BY 4.0. La fuente rellenó algunos huecos; conservamos sus marcadores, que el analizador no interpreta. `;
-    const link = document.createElement('a'); link.href = 'https://data.open-power-system-data.org/household_data/2020-04-15/'; link.textContent = 'Procedencia y licencia'; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.style.textDecoration = 'underline'; exampleHelp.append(note, link);
+    const link = document.createElement('a'); link.href = 'https://data.open-power-system-data.org/household_data/2020-04-15/';
+    if (example === 'uci-household') { note.textContent = `${REAL_EXAMPLES[example].task} Revisa las sugerencias antes de confirmar. Datos: Hebrail y Berard (2006), UCI, CC BY 4.0. Extracto sin rellenos ni cambios en celdas. `; link.href = 'https://doi.org/10.24432/C58K54'; }
+    link.textContent = 'Procedencia y licencia'; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.style.textDecoration = 'underline'; exampleHelp.append(note, link);
   }
   clearReport(); el('setup').hidden = true;
   if (file.size > MAX_BYTES) { status('El límite del MVP es 10 MiB. Selecciona un archivo más pequeño.'); return; }
@@ -214,7 +223,7 @@ function showDetail(f: Finding, origin: HTMLButtonElement) {
   detail.focus({ preventScroll: true }); detail.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' });
 }
 select('demo').replaceChildren(...Object.entries(EXAMPLES).map(([id, e]) => new Option(e.title, id)));
-const realGroup = document.createElement('optgroup'); realGroup.label = 'Datos reales · CoSSMic · CC BY 4.0';
+const realGroup = document.createElement('optgroup'); realGroup.label = 'Datos reales · CoSSMic y UCI · CC BY 4.0';
 realGroup.append(...Object.entries(REAL_EXAMPLES).map(([id, e]) => new Option(e.title, `real:${id}`))); select('demo').append(realGroup);
 input('file').onchange = () => { const file = input('file').files?.[0]; if (file) load(file); input('file').value = ''; };
 el('load-demo').onclick = () => { const selected = select('demo').value; const real = selected.startsWith('real:'); const id = real ? selected.slice(5) : selected; load(new File([(real ? REAL_EXAMPLES : EXAMPLES)[id].text], `${id}.csv`, { type: 'text/csv' }), real ? id : null); };
