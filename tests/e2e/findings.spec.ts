@@ -1,3 +1,4 @@
+import { expectNarrowReflow } from './layout';
 import { disconnectNetwork } from './network';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
@@ -41,7 +42,7 @@ test('search, sample pages and row scope preserve the complete exported counts',
   await expect(page.getByLabel('Buscar regla o descripción')).toBeFocused();
   await expect(page.getByLabel('Fila CSV en las muestras')).toHaveValue('');
   await page.setViewportSize({ width: 320, height: 800 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expectNarrowReflow(page);
 });
 
 test('real battery file exposes missing values through the browser worker', async ({ page }) => {

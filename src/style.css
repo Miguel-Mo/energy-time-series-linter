@@ -20,3 +20,5 @@ table{font-size:13px}th{color:#52654b}td:first-child{color:#52654b}.table-wrap{o
 @media(max-width:620px){.finding-filters{grid-template-columns:1fr}.sample-pagination{justify-content:flex-start}.sample-pagination p{order:-1;flex-basis:100%}}
 
 .export-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.workspace>*,.form-grid>*{min-width:0}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:620px){.workspace,.form-grid{grid-template-columns:minmax(0,1fr)}}

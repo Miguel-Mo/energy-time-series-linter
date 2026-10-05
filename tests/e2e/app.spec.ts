@@ -1,3 +1,4 @@
+import { expectNarrowReflow } from './layout';
 import { disconnectNetwork } from './network';
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
@@ -132,5 +133,5 @@ test('keyboard, accessible errors, contrast and narrow-screen reflow', async ({ 
   result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
   expect(result.violations).toEqual([]);
   await page.setViewportSize({ width: 320, height: 800 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expectNarrowReflow(page);
 });
