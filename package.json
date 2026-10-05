@@ -1,6 +1,6 @@
 {
   "name": "energy-time-series-linter",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -8,6 +8,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "test:parity": "node scripts/check-report-parity.mjs",
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",

@@ -8,7 +8,7 @@ import './style.css';
 import { initializeForm, syncGuidance, setLocalColumns, collectConfig, checkForm, clearErrors } from './configuration';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <a class="skip-link" href="#main" tabindex="0">Saltar al contenido</a>
   <header class="topbar"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">∿</span> Energy tools <span class="brand-divider">/</span> <span class="brand-sub">Time-Series Linter</span></a><span class="local-tag"><span aria-hidden="true">●</span> LOCAL & PRIVADO</span></header>
   <main id="main" tabindex="-1">
     <section class="intro"><p class="eyebrow">DATOS ENERGÉTICOS · CÓDIGO ABIERTO</p><h1>Conoce tus datos.<br><span>Antes de importarlos.</span></h1><p class="lede">Revisa fechas, intervalos y valores de tu CSV. Entiende qué necesita atención antes de importarlo en otra herramienta.</p><p class="privacy"><span aria-hidden="true">◈</span> Your file is processed locally and is not uploaded.</p></section>

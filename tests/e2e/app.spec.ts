@@ -1,3 +1,4 @@
+import { disconnectNetwork } from './network';
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -7,9 +8,9 @@ import AxeBuilder from '@axe-core/playwright';
 test('offline analysis, JSON export, finding details and responsive layout', async ({ page, context }, testInfo) => {
   const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo');
-  await page.screenshot({ path: testInfo.outputPath('landing.png'), fullPage: true, scale: 'css' });
+  await page.bringToFront();
   const requests: string[] = []; context.on('request', r => { if (/^https?:|^wss?:/.test(r.url())) requests.push(r.url()); });
-  await context.setOffline(true);
+  await disconnectNetwork(context);
   await page.locator('#file').setInputFiles({ name: 'example.csv', mimeType: 'text/csv', buffer: Buffer.from(EXAMPLES.duplicate.text) });
   await expect(page.getByRole('status')).toContainText('Archivo leído');
   await page.getByLabel('Tipo de medición').selectOption('power-instant');
@@ -52,7 +53,7 @@ test('empty, oversized and invalid-encoding files fail safely', async ({ page })
 test('large analysis remains cancellable and can restart offline', async ({ page, context }) => {
   test.setTimeout(45000);
   await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo');
-  await context.setOffline(true);
+  await disconnectNetwork(context);
   const text = 'timestamp,power_kW\n' + Array.from({ length: 100000 }, (_, i) => `${new Date(Date.UTC(2024, 0, 1) + i * 900000).toISOString()},2`).join('\n');
   await page.locator('#file').setInputFiles({ name: 'large-valid.csv', mimeType: 'text/csv', buffer: Buffer.from(text) });
   await expect(page.getByRole('status')).toContainText('Archivo leído');

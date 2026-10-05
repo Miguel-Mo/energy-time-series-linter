@@ -44,3 +44,5 @@ No incluye reparaciones, interpolación de huecos, imputación, IA, gráficas av
 ## Reproducibilidad
 
 Sin reloj de ejecución, IDs aleatorios ni opciones implícitas de zona. El mismo archivo (bytes), configuración, versión y entorno de zonas producen el mismo JSON. **Intl utiliza la base de zonas del navegador/SO**; cambios de tzdata entre entornos pueden cambiar interpretaciones locales históricas o futuras. El MVP no fija una copia independiente de tzdata. Las entradas con offsets explícitos y sin contraste de zona son independientes de esa base. Las versiones de bibliotecas están bloqueadas con el lockfile. No se promete igualdad de resultados para entornos con reglas regionales distintas.
+
+Desde 0.7.0 se compara el JSON completo de dos series UTC en Chromium, Firefox y WebKit, con zonas del navegador America/Los_Angeles y Asia/Tokyo. Es evidencia acotada a esos casos y versiones; véase [H8](browser-reproducibility.md). WebKit se verifica bloqueando tráfico HTTP(S)/WebSocket: su emulación offline en Windows impide leer incluso archivos en memoria, por lo que no se equipara esa prueba a una desconexión física de Safari.

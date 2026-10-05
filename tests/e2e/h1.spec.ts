@@ -1,3 +1,4 @@
+import { disconnectNetwork } from './network';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
@@ -7,7 +8,7 @@ const manifest = JSON.parse(readFileSync('examples/real/manifest.json', 'utf8'))
 for (const fixture of manifest.cases) {
   test(`H1 internal walkthrough: ${fixture.file}`, async ({ page, context }, testInfo) => {
     await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo');
-    await context.setOffline(true);
+    await disconnectNetwork(context);
     const requests: string[] = []; context.on('request', r => { if (/^https?:/.test(r.url())) requests.push(r.url()); });
     await page.getByLabel('Archivo de ejemplo').selectOption('real:' + fixture.file.replace('.csv', ''));
     await page.getByRole('button', { name: 'Probar ejemplo' }).click();

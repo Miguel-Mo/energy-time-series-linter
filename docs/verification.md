@@ -1,4 +1,12 @@
-# Verificación de la entrega 0.6.0
+# Verificación de la entrega 0.7.0
+
+H8, 5 de octubre de 2026, Windows: **93 pruebas unitarias y 72 pruebas de navegador correctas**. Ejecución completa de Playwright con un proceso, sin reintentos: 3,5 minutos, salida 0. Build TypeScript/Vite y catálogo correctos. Permanece el aviso de tamaño del paquete con los ejemplos locales (958,20 kB de JS; 180,25 kB gzip).
+
+`npm run test:parity` confirmó igualdad exacta de los informes JSON de dos series (sintética de 15 minutos y solar CoSSMic), con America/Los_Angeles y Asia/Tokyo como zonas del navegador. Motores registrados: Chromium 153.0.8010.12, Firefox 155.0 y WebKit 26.6. Cuatro proyectos con 18 casos cada uno: escritorio Chromium, emulación Pixel 7, Firefox y WebKit. Los contextos de paridad aíslan la zona y no aplican emulación móvil.
+
+Se comprobó el enlace de salto corregido, teclado, axe, importación de datos reales, cancelación, hallazgos y exportación. En WebKit Windows se bloquean HTTP(S) y WebSocket porque su emulación offline falla incluso con archivos en memoria; Chromium y Firefox también activan `setOffline(true)`. No equivale a validar Safari en un dispositivo físico. Las intermitencias de Chromium observadas en ejecuciones anteriores y el alcance de esta evidencia se conservan en [método y límites de H8](browser-reproducibility.md). CI remoto y publicación siguen pendientes.
+
+## Base anterior: entrega 0.6.0
 
 H7, 28 de septiembre de 2026: **93 pruebas unitarias y 34 pruebas de navegador correctas**, build y catálogo correctos. Ejecución final: `npx playwright test --workers=2`, cierre limpio en 56,2 s. Una ejecución anterior con seis procesos completó las comprobaciones pero quedó abierta al terminar y se interrumpió; no se utiliza como evidencia de cierre. Guía abierta desde hallazgos temporales, foco, conservación de datos/resultados y axe comprobados en escritorio y móvil. La detección de zona comprueba columnas temporales mixtas, regionales y separadas. Capturas inspeccionadas en [guía H7](temporal-guidance.md).
 

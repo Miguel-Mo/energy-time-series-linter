@@ -42,8 +42,9 @@ El archivo original nunca se modifica. Los negativos pueden representar exportac
 ```sh
 npm test
 npm run build
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm run test:e2e
+npm run test:parity
 npm run docs:check
 ```
 
@@ -66,6 +67,7 @@ La construcción usa `base: './'` y funciona tanto en dominio raíz como bajo `/
 - [UCI: potencia media con fecha y hora separadas](examples/uci/README.md)
 - [Formatos reales verificados y límites de H6](docs/real-format-compatibility.md)
 - [H7: guía de zonas horarias y cambios de hora](docs/temporal-guidance.md)
+- [H8: navegadores y reproducibilidad del JSON](docs/browser-reproducibility.md)
 - [Verificación y capturas](docs/verification.md)
 - [Entrega de usabilidad 0.2.0](docs/milestones.md)
 - [H1: evaluación interna sin participantes y guía de prueba](docs/h1-internal-evaluation.md)

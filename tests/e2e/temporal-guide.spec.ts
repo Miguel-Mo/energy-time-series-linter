@@ -1,3 +1,4 @@
+import { disconnectNetwork } from './network';
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 test('timezone guidance follows offsets in the selected time column, including later rows', async ({ page }) => {
@@ -12,7 +13,7 @@ test('timezone guidance follows offsets in the selected time column, including l
   await expect(page.locator('#timezone-help')).toContainText('fechas locales');
 });
 test('ambiguous local time links to actionable guidance without changing the data', async ({ page, context }, testInfo) => {
-  await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo'); await context.setOffline(true);
+  await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo'); await disconnectNetwork(context);
   await page.locator('#file').setInputFiles({ name: 'autumn-local.csv', mimeType: 'text/csv', buffer: Buffer.from('timestamp,power_kW\n2024-10-27T02:30:00,2\n2024-10-27T03:30:00,2') });
   await expect(page.getByRole('status')).toContainText('Archivo leído');
   await page.getByLabel('Tipo de medición').selectOption('power-instant'); await page.locator('#timezone').fill('Europe/Madrid');

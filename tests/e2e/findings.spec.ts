@@ -1,10 +1,11 @@
+import { disconnectNetwork } from './network';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 
 test('search, sample pages and row scope preserve the complete exported counts', async ({ page, context }, testInfo) => {
   await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo');
-  await context.setOffline(true);
+  await disconnectNetwork(context);
   const text = 'timestamp,energy_kWh\n' + Array.from({ length: 61 }, (_, i) => `${new Date(Date.UTC(2024, 0, 1) + i * 3600000).toISOString()},${i === 60 ? '1' : ''}`).join('\n');
   await page.locator('#file').setInputFiles({ name: 'many-missing.csv', mimeType: 'text/csv', buffer: Buffer.from(text) });
   await expect(page.getByRole('status')).toContainText('Archivo leído');

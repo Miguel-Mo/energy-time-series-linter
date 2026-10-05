@@ -1,7 +1,8 @@
+import { disconnectNetwork } from './network';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 test('UCI split-date import, correction and export work offline', async ({ page, context }, testInfo) => {
-  await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo'); await context.setOffline(true);
+  await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo'); await disconnectNetwork(context);
   await page.getByLabel('Archivo de ejemplo').selectOption('real:uci-household'); await page.getByRole('button', { name: 'Probar ejemplo' }).click();
   await expect(page.getByRole('status')).toContainText('Archivo leído');
   await expect(page.locator('#example-help')).toContainText('la fuente no declara la zona');

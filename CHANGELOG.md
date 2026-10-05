@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0 — 2026-10-05
+
+- H8: matriz Chromium escritorio/móvil emulado, Firefox y WebKit; CI y Pages preparados para los tres motores.
+- Comparación exacta de informes para dos series y dos zonas del navegador, con versiones registradas y comprobación entre motores.
+- Enlace de salto con foco explícito para WebKit; pruebas con HTTP(S)/WebSocket bloqueados y limitación de emulación offline WebKit Windows documentada.
+
 ## 0.6.0 — 2026-09-28
 
 - H7: guía en la configuración sobre UTC, offsets, zonas IANA y cambios horarios, enlazada desde hallazgos relevantes.

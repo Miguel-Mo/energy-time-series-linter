@@ -1,4 +1,4 @@
-# Hitos de usabilidad — entrega actual 0.6.0
+# Hitos de usabilidad — entrega actual 0.7.0
 
 La entrega 0.2.0 abordó H1, H2, H3 y H5; 0.3.0 añadió H4. En 0.3.1, ante la decisión del propietario de no disponer de participantes, H1 se reformula y se cierra mediante evaluación interna documentada. La validación con usuarios no se ha realizado y deja de ser requisito bloqueante; la publicación sigue pendiente.
 
@@ -11,7 +11,7 @@ La entrega 0.2.0 abordó H1, H2, H3 y H5; 0.3.0 añadió H4. En 0.3.1, ante la d
 | H5. Accesibilidad | Texto y contraste, controles táctiles, enlace de salto, foco y teclado, errores asociados, movimiento reducido, auditoría axe | Mejoras implementadas; la evaluación manual con lectores de pantalla y usuarios sigue pendiente. No es una declaración de conformidad WCAG. |
 | H6. Formatos reales | CoSSMic y UCI: offsets compactos, selección regional explícita, hora separada, pruebas de importación y referencia energética independiente | Entrega completada en 0.5.0 para el corpus documentado de dos fuentes. No implica compatibilidad universal: preámbulos, codificaciones distintas de UTF-8 y formatos fuera del perfil siguen excluidos. |
 | H7. Guía temporal | Guía desplegable, ejemplos históricos de horas repetidas/inexistentes y acceso desde hallazgos temporales | Implementado en 0.6.0, probado sin conexión, teclado y axe. Exigencia de zona basada en la columna temporal seleccionada, también con hora separada y fechas regionales. |
-| H8. Reproducibilidad y navegadores | Ampliar pruebas fuera de Chromium y documentar diferencias temporales | Pendiente; móvil actual es emulación Chromium. |
+| H8. Reproducibilidad y navegadores | Matriz Chromium, Firefox y WebKit; comparación exacta de JSON con dos zonas del navegador | Completado en 0.7.0 para el alcance documentado: 72 pruebas de navegador y paridad exacta correctas. [Método y límites](browser-reproducibility.md): WebKit usa bloqueo de red por limitación de su emulación offline en Windows; móvil es emulación, no dispositivo físico. |
 | H9. Portabilidad del informe | Facilitar compartir e interpretar el informe fuera de la aplicación | JSON versionado disponible; ampliación pendiente. |
 | H10. Beta pública | Preparar publicación, documentación y canal de incidencias | Pendiente; sin despliegue público. |
 
