@@ -23,3 +23,9 @@ for (const name of ['papaparse', '@js-temporal/polyfill', 'jsbi']) {
 await mkdir('public', { recursive: true });
 await output('THIRD_PARTY_NOTICES.md', notices);
 await output('public/THIRD_PARTY_NOTICES.txt', notices);
+await output('public/LICENSE.txt', await readFile('LICENSE', 'utf8'));
+await output('public/SUPPORT.txt', await readFile('SUPPORT.md', 'utf8'));
+await output('public/BETA.txt', await readFile('docs/beta-release.md', 'utf8'));
+let dataNotices = 'Datos de ejemplo incorporados en la aplicación\n\nCC BY 4.0; no están bajo la licencia MIT del código. Los enlaces relativos de las notas siguientes se refieren al repositorio fuente. Se conservan atribución, cambios e hipótesis del publicador.\n\n';
+for (const source of ['real', 'uci']) dataNotices += `${await readFile(`examples/${source}/README.md`, 'utf8')}\n\nMetadatos y hashes:\n${await readFile(`examples/${source}/manifest.json`, 'utf8')}\n\n`;
+await output('public/DATA_NOTICES.txt', dataNotices);

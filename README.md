@@ -4,14 +4,14 @@ Una pequeña herramienta open source para revisar un CSV energético antes de im
 
 **Your file is processed locally and is not uploaded.**
 
-MVP experimental independiente. No certifica datos ni conformidad con estándares. La investigación inicial y las diferencias frente a herramientas existentes están en [docs/research.md](docs/research.md).
+Beta experimental independiente, candidata 0.9.0; publicación pública pendiente. No certifica datos ni conformidad con estándares. La investigación inicial y las diferencias frente a herramientas existentes están en [docs/research.md](docs/research.md).
 
 ## Instalación y uso
 
 Requisitos de desarrollo: Node.js 24 o posterior y npm. Navegador moderno con Web Workers, Web Crypto e Intl; servir por HTTPS o localhost.
 
 ```sh
-npm install
+npm ci
 npm test
 npm run build
 npm run preview
@@ -46,17 +46,24 @@ npx playwright install chromium firefox webkit
 npm run test:e2e
 npm run test:parity
 npm run docs:check
+npm run release:check
 ```
 
 Vitest cubre CSV, números, límites, timestamps, DST de Madrid, intervalos, energía y reproducibilidad. Playwright prueba la compilación real en escritorio y móvil, desconecta la red, cuenta solicitudes, descarga JSON, verifica texto malicioso y ausencia de almacenamiento. Genera capturas en `test-results/`. El puerto 43871 se reserva para estas pruebas y no se reutiliza otro servidor existente.
 
 ## Publicación en GitHub Pages
 
+La [guía de beta y distribución](docs/beta-release.md) recoge los pasos, límites y comprobaciones. Para generar un ZIP de dist verificado, ejecuta `npm run release:check` y `python scripts/package-release.py`. Incluye licencia del código, atribuciones de datos/dependencias, guía, plantilla de soporte y manifiesto SHA-256.
+
 El proyecto es independiente; no contiene credenciales ni un repositorio remoto preconfigurado. Para publicarlo, crea el repositorio de GitHub y sube estos archivos. En **Settings → Pages → Build and deployment**, selecciona **GitHub Actions**. Ejecuta manualmente el workflow **Deploy Pages** desde la rama que quieras publicar. Necesitas habilitar Pages en tu cuenta/repositorio.
 
 La construcción usa `base: './'` y funciona tanto en dominio raíz como bajo `/nombre-del-repositorio/`. `dist/` es el artefacto publicable; ningún servidor de procesamiento es necesario. El workflow CI verifica cada push y pull request; el despliegue solo se activa manualmente y ejecuta las pruebas antes de publicar.
 
 ## Documentación
+
+- [Comunicar un problema sin datos privados](SUPPORT.md)
+- [Contribuir](CONTRIBUTING.md)
+- [H10: preparación y publicación de la beta](docs/beta-release.md)
 
 - [Alcance y límites](docs/scope.md)
 - [Investigación y convenciones públicas](docs/research.md)

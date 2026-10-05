@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0 — 2026-10-05 — candidata beta, sin publicar
+
+- H10: guía de beta y soporte desde la interfaz; plantillas de fallos/mejoras y guía de contribución.
+- Licencia MIT y atribuciones CoSSMic/OPSD, UCI y dependencias incluidas en la distribución estática.
+- Comprobación de distribución, manifiesto SHA-256 y ZIP local verificable. CI y Pages comprueban el paquete antes de publicar.
+- Publicación y canal GitHub Issues pendientes de definir el repositorio remoto.
+
 ## 0.8.0 — 2026-10-05
 
 - H9: informe HTML autónomo para lectura sin conexión e impresión, junto al JSON 2.0.0 existente.

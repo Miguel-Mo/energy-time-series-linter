@@ -1,0 +1,39 @@
+name: Fallo de la aplicación
+description: Un resultado o comportamiento que puedes reproducir.
+title: "[Fallo] "
+body:
+  - type: markdown
+    attributes:
+      value: "No adjuntes datos privados. Usa un ejemplo incluido o filas sintéticas. Los informes JSON/HTML pueden contener muestras del CSV."
+  - type: input
+    id: environment
+    attributes:
+      label: Versión de la app, navegador y sistema
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos y configuración para reproducir
+      description: "Indica ejemplo, columnas, unidad, tipo de medición, formato de fechas y zona."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado y motivo
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Resultado obtenido o mensaje literal
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Revisión del contenido
+      options:
+        - label: He eliminado datos personales, credenciales y archivos privados.
+          required: true

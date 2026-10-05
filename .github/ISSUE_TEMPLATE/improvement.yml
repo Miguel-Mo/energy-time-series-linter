@@ -1,0 +1,16 @@
+name: Mejora de uso
+description: Explica una dificultad y el resultado que necesitas.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qué intentabas hacer y dónde te bloqueaste
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Qué resultado te ayudaría
+      description: "No incluyas archivos privados ni datos personales."
+    validations:
+      required: true

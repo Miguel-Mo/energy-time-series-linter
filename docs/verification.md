@@ -1,4 +1,12 @@
-# Verificación de la entrega 0.8.0
+# Verificación de la candidata beta 0.9.0
+
+H10, preparación local, 5 de octubre de 2026, Windows: **95 pruebas unitarias y 80 pruebas de navegador correctas**, suite íntegra en 3,5 minutos y paridad JSON correcta. Build y catálogo correctos. El aviso de tamaño permanece: 965,44 kB de JS, 183,25 kB gzip.
+
+Se verificaron desde la interfaz las cinco rutas de guía, soporte y licencias en Chromium escritorio/móvil emulado, Firefox y WebKit. `release:check` comprobó los ocho archivos distribuidos y generó el manifiesto SHA-256. El ZIP contiene esos ocho archivos más el manifiesto; comprobación CRC y todos los hashes internos correctos. No incluye cachés, CSV de usuario ni resultados de pruebas. Las plantillas de Issues están preparadas, pero su funcionamiento remoto no se ha probado.
+
+La publicación sigue pendiente: no hay remoto, CI Linux observado ni URL pública verificada. Por ello H10 no se declara cerrado como beta pública. [Procedimiento y condiciones de publicación](beta-release.md).
+
+## Base anterior: entrega 0.8.0
 
 H9, 5 de octubre de 2026, Windows: **95 pruebas unitarias y 76 pruebas de navegador correctas**, suite completa en 3,5 minutos, sin reintentos. Build TypeScript/Vite y catálogo correctos; paridad exacta del JSON de los casos H8 confirmada. Mismos motores registrados en H8. Paquete JS de 964,68 kB (182,97 kB gzip), con aviso de tamaño de Vite.
 

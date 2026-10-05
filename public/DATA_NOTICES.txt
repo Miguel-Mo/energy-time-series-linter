@@ -1,0 +1,178 @@
+Datos de ejemplo incorporados en la aplicación
+
+CC BY 4.0; no están bajo la licencia MIT del código. Los enlaces relativos de las notas siguientes se refieren al repositorio fuente. Se conservan atribución, cambios e hipótesis del publicador.
+
+# Datos reales para probar
+
+Cuatro extractos de mediciones públicas de **CoSSMic / Open Power System Data**, versión 2020-04-15. Son datos históricos de instalaciones de Alemania, procesados por el publicador; no son series sintéticas. Todos están por debajo de 150 kB y se pueden cargar directamente en la herramienta.
+
+## Abrir y configurar
+
+1. Abre la aplicación y carga uno de los CSV de esta carpeta.
+2. Fecha y hora: **utc_timestamp**. Valores: la columna que empieza por **DE_KN_** (la segunda).
+3. Tipo: **Contador acumulado**. Unidad: **kWh**. Decimal: **punto**. Separador: **coma**.
+4. Cadencia esperada: **60 minutos**. Deja la zona horaria y el periodo esperado vacíos: los timestamps principales ya contienen `Z` (UTC).
+5. Analiza. No selecciones «Energía por intervalo»: sumar los valores acumulados produciría un resultado incorrecto.
+
+| Archivo | Periodo UTC, extremo final excluido | Filas | Valores ausentes | Filas marcadas como interpoladas para esta señal |
+| --- | --- | ---: | ---: | ---: |
+| [consumo-industrial.csv](consumo-industrial.csv) | 1 marzo–1 abril 2016 | 744 | 0 | 362 |
+| [solar-industrial.csv](solar-industrial.csv) | 1 marzo–1 abril 2016 | 744 | 0 | 256 |
+| [bateria-inicio-registro.csv](bateria-inicio-registro.csv) | 24 abril–2 mayo 2016 | 192 | 39 | 0 |
+| [consumo-escuela.csv](consumo-escuela.csv) | 1 junio–1 julio 2016 | 720 | 0 | 171 |
+
+## Qué comprobar
+
+- **Consumo industrial:** carga de un contador real con 744 timestamps horarios únicos. Completitud temporal y utilizable: 100 % dentro del periodo observado.
+- **Solar:** contador con periodos sin incremento, incluidos periodos nocturnos. Una señal constante no implica automáticamente un sensor averiado. Los timestamps UTC atraviesan el cambio horario europeo de marzo sin duplicarse.
+- **Batería:** conserva 39 valores vacíos al comienzo de la selección, antes de que empiece este registro. Completitud temporal: 100 %; utilizable: 79,6875 %. Sirve para comprobar que tener todas las fechas no equivale a tener todos los valores. No se han borrado datos artificialmente.
+- **Escuela:** otro patrón de consumo y 720 registros horarios. Completitud temporal y utilizable: 100 % en el periodo observado.
+
+Los valores utilizables no equivalen a mediciones originales verificadas: la herramienta no interpreta la columna `interpolated`. La fuente regularizó y rellenó huecos. Conservamos su marcador completo (también menciona otras señales del archivo fuente); solo las menciones a la columna elegida son relevantes. Un marcador vacío no certifica ausencia de procesamiento previo.
+
+La columna auxiliar `cet_cest_timestamp` se conserva exactamente como se publicó, incluidos offsets `+0100`/`+0200`, admitidos desde la app 0.4.0. Puedes elegirla como fecha y hora sin indicar zona: debe producir los mismos instantes, energía y completitud que UTC. Para contrastar los cambios de offset con una región puedes indicar `Europe/Berlin`; no se sobrescribe el offset original. El contador horario de la fuente se remuestreó con `.last()`; su etiqueta corresponde al inicio de la ventana según los metadatos. No debe interpretarse como una medida instantánea tomada exactamente a ese segundo.
+
+Estos casos amplían la prueba técnica; no sustituyen sesiones de usabilidad con personas ni validación independiente.
+
+## Procedencia, licencia y reproducción
+
+- [Publicación y descarga originales](https://data.open-power-system-data.org/household_data/2020-04-15/).
+- [Metadatos y licencia de los datos](https://data.open-power-system-data.org/household_data/2020-04-15/datapackage.json): **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**. Los datos de esta carpeta no están bajo la licencia MIT del código.
+- Atribución: Open Power System Data. 2020. Data Package Household Data. Version 2020-04-15. Datos primarios: CoSSMic. Véase la publicación enlazada.
+- [Procesamiento publicado en GitHub](https://github.com/isc-konstanz/household_data/blob/2020-04-15/processing.ipynb).
+
+Modificaciones realizadas aquí: seleccionar periodos y cuatro columnas; serializar como CSV UTF-8 con saltos LF. Sin cambiar números, timestamps, marcadores ni valores vacíos; sin interpolar, convertir unidades ni añadir anomalías.
+
+Desde la raíz del repositorio: `node scripts/prepare-real-data.mjs`. Descarga aproximadamente 15 MB la primera vez; reutiliza después `data-cache/opsd-60min.csv` y los metadatos. La caché conserva el archivo publicado intacto, no el material bruto de los sensores, y está excluida de Git. [manifest.json](manifest.json) contiene hashes SHA-256, rangos de líneas del original, tamaños y configuración. `npx vitest run tests/real-data.test.ts` comprueba integridad y métricas con el motor real de la aplicación.
+
+
+Metadatos y hashes:
+{
+  "source": "https://data.open-power-system-data.org/household_data/2020-04-15/",
+  "download": "https://data.open-power-system-data.org/household_data/2020-04-15/household_data_60min_singleindex.csv",
+  "sourceSha256": "15956440b27465686eae2abf5895cbc3dab80f934a891bcb2f4f944428e97d60",
+  "sourceBytes": 15654559,
+  "metadataSha256": "93500241f4bb19f84f2668b100f53ec531e0c7dcbfa5d8759425c1375d588670",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "Open Power System Data. 2020. Data Package Household Data. Version 2020-04-15. Primary data: CoSSMic.",
+  "transformation": "Select rows by UTC range [start, end) and columns only. Preserve numeric strings, empty values, timestamps and the complete upstream interpolated marker. No interpolation or unit conversion added.",
+  "caveat": "Real measurements processed by the publisher, including upstream gap filling. Contadores acumulados: NO sumar como energia por intervalo. The linter does not interpret the interpolated column.",
+  "configuration": {
+    "timestampColumn": 0,
+    "valueColumn": 1,
+    "unit": "kWh",
+    "measurement": "counter",
+    "timezone": "",
+    "decimal": ".",
+    "delimiter": ",",
+    "intervalMinutes": null,
+    "intervalPosition": "start",
+    "cadenceMinutes": 60,
+    "expectedStart": null,
+    "expectedEnd": null,
+    "highValue": null,
+    "constantHours": 24,
+    "jumpFactor": 10
+  },
+  "cases": [
+    {
+      "file": "consumo-industrial.csv",
+      "column": "DE_KN_industrial1_grid_import",
+      "startInclusive": "2016-03-01",
+      "endExclusive": "2016-04-01",
+      "rows": 744,
+      "firstSourceLine": 10689,
+      "lastSourceLine": 11432,
+      "missingValues": 0,
+      "upstreamMarkedRows": 362,
+      "sha256": "92a5f528dbb0aeccc08dc9ecba3a54cea6f798175275024685e969f6b5e8f794",
+      "bytes": 140802
+    },
+    {
+      "file": "solar-industrial.csv",
+      "column": "DE_KN_industrial1_pv_1",
+      "startInclusive": "2016-03-01",
+      "endExclusive": "2016-04-01",
+      "rows": 744,
+      "firstSourceLine": 10689,
+      "lastSourceLine": 11432,
+      "missingValues": 0,
+      "upstreamMarkedRows": 256,
+      "sha256": "c2e03148606aeae9de31f49e1f800aca3cf3740003bd0d6943992662168f50dd",
+      "bytes": 139307
+    },
+    {
+      "file": "bateria-inicio-registro.csv",
+      "column": "DE_KN_industrial2_storage_charge",
+      "startInclusive": "2016-04-24",
+      "endExclusive": "2016-05-02",
+      "rows": 192,
+      "firstSourceLine": 11985,
+      "lastSourceLine": 12176,
+      "missingValues": 39,
+      "upstreamMarkedRows": 0,
+      "sha256": "8882ac6fd0ee25d7c2b1e806df3f8b3c7d89facaa744c9b7780b916988583045",
+      "bytes": 46503
+    },
+    {
+      "file": "consumo-escuela.csv",
+      "column": "DE_KN_public1_grid_import",
+      "startInclusive": "2016-06-01",
+      "endExclusive": "2016-07-01",
+      "rows": 720,
+      "firstSourceLine": 12897,
+      "lastSourceLine": 13616,
+      "missingValues": 0,
+      "upstreamMarkedRows": 171,
+      "sha256": "e9314a877650f62ed908c562df6d41a44cf94896acfc55bc99666a22a49810d4",
+      "bytes": 113358
+    }
+  ]
+}
+
+
+# UCI: fecha y hora separadas
+
+Extracto público real de 1440 registros del 17 de diciembre de 2006, conservando las nueve columnas, los separadores `;`, los números y los saltos de línea originales. Se cambia únicamente la extensión de `.txt` a `.csv` y se selecciona un día. No se rellenan valores.
+
+Fuente: [Individual Household Electric Power Consumption](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption). Atribución: Hebrail, G. & Berard, A. (2006), UCI Machine Learning Repository, [DOI 10.24432/C58K54](https://doi.org/10.24432/C58K54). Datos bajo [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), no bajo la licencia MIT del código.
+
+En la app 0.5.0 elige **Real · UCI · Fecha y hora separadas**. También puedes cargar [el CSV](household-2006-12-17.csv) y configurar:
+
+| Campo | Valor |
+| --- | --- |
+| Fecha | Date, primera columna |
+| Formato | Día/mes/año |
+| Hora separada | Time, segunda columna |
+| Valores | Global_active_power, tercera columna |
+| Tipo y unidad | Potencia media por intervalo, kW |
+| Separador / decimal | Punto y coma / punto |
+| Duración / cadencia | 1 minuto / 1 minuto |
+| Zona propuesta | Europe/Paris, hipótesis geográfica explícita |
+| Posición propuesta | Inicio, hipótesis de prueba |
+
+La fuente identifica potencia media por minuto y la ubicación Sceaux (Francia), pero no declara zona horaria ni si la etiqueta temporal corresponde al inicio o final del intervalo. Las propuestas se muestran como hipótesis en la interfaz. No hay transición DST en el día seleccionado. El total de medias × 1/60 h es independiente de la hipótesis inicio/fin; la cobertura temporal sí depende de ella.
+
+Resultado de referencia: **56,5076666667 kWh**, 1440 valores presentes. La referencia se calcula con Decimal de Python directamente desde los valores publicados, separadamente del motor TypeScript. No acredita precisión física de los sensores.
+
+Reproducir: `python scripts/prepare-uci-data.py`, con Python 3 y biblioteca estándar. Descarga unos 20 MB la primera vez y conserva el ZIP original en `data-cache/` (fuera de Git). [manifest.json](manifest.json) contiene URL, hashes del ZIP y extracto, rango de líneas, atribución e hipótesis. El archivo completo supera los límites de la aplicación; este extracto ocupa unos 95 kB.
+
+
+Metadatos y hashes:
+{
+  "source": "https://doi.org/10.24432/C58K54",
+  "download": "https://archive.ics.uci.edu/static/public/235/individual+household+electric+power+consumption.zip",
+  "attribution": "Hebrail, G. & Berard, A. (2006). Individual Household Electric Power Consumption. UCI Machine Learning Repository.",
+  "license": "CC-BY-4.0",
+  "archiveSha256": "9f84b46ade8a2d8e1286ec4b2b6c2987a45a755c59f263be3b3b3d10dfbda3ff",
+  "file": "household-2006-12-17.csv",
+  "sha256": "1587903034707467924da7a026ce2aa088722096971b66a7124eea83706a9440",
+  "bytes": 95316,
+  "rows": 1440,
+  "firstSourceLine": 398,
+  "lastSourceLine": 1837,
+  "expectedEnergyKWh": "56.50766666666666666666666667",
+  "transformation": "Select 17/12/2006 and retain original header, columns, lines and bytes; extension changed to .csv.",
+  "assumptions": "Europe/Paris is a declared geographic interpretation, not a timezone specified by UCI. Timestamp start/end position is not documented; start is an explicit testing assumption. One-minute duration is documented. No DST transition in this extract."
+}
