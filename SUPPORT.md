@@ -2,7 +2,7 @@
 
 La beta es una ayuda experimental, no una certificación de datos. Si aparece un hallazgo, lee primero su explicación y la configuración elegida: un aviso no implica un fallo de la herramienta.
 
-Para un fallo de la aplicación, usa la plantilla de incidencias del repositorio donde se publique esta distribución. En una copia local sin repositorio publicado, conserva una copia de esta plantilla y entrégala al mantenedor por el canal que hayas acordado. La aplicación no envía mensajes ni adjuntos automáticamente.
+Para un fallo de la aplicación, abre https://github.com/Miguel-Mo/energy-time-series-linter/issues/new/choose y elige la plantilla de fallo o mejora. La aplicación no envía mensajes ni adjuntos automáticamente.
 
 ## Plantilla
 

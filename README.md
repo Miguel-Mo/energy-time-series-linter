@@ -4,7 +4,7 @@ Una pequeña herramienta open source para revisar un CSV energético antes de im
 
 **Your file is processed locally and is not uploaded.**
 
-Beta experimental independiente, candidata 0.9.0; publicación pública pendiente. No certifica datos ni conformidad con estándares. La investigación inicial y las diferencias frente a herramientas existentes están en [docs/research.md](docs/research.md).
+Beta experimental independiente, 0.9.0. No certifica datos ni conformidad con estándares. La investigación inicial y las diferencias frente a herramientas existentes están en [docs/research.md](docs/research.md).
 
 ## Instalación y uso
 
@@ -55,7 +55,7 @@ Vitest cubre CSV, números, límites, timestamps, DST de Madrid, intervalos, ene
 
 La [guía de beta y distribución](docs/beta-release.md) recoge los pasos, límites y comprobaciones. Para generar un ZIP de dist verificado, ejecuta `npm run release:check` y `python scripts/package-release.py`. Incluye licencia del código, atribuciones de datos/dependencias, guía, plantilla de soporte y manifiesto SHA-256.
 
-El proyecto es independiente; no contiene credenciales ni un repositorio remoto preconfigurado. Para publicarlo, crea el repositorio de GitHub y sube estos archivos. En **Settings → Pages → Build and deployment**, selecciona **GitHub Actions**. Ejecuta manualmente el workflow **Deploy Pages** desde la rama que quieras publicar. Necesitas habilitar Pages en tu cuenta/repositorio.
+Repositorio oficial: https://github.com/Miguel-Mo/energy-time-series-linter. Sitio de la beta: https://miguel-mo.github.io/energy-time-series-linter/. Para publicar una copia independiente, crea tu repositorio y sube los archivos. En **Settings → Pages → Build and deployment**, selecciona **GitHub Actions**. Ejecuta manualmente el workflow **Deploy Pages** desde la rama que quieras publicar. Necesitas habilitar Pages en tu cuenta/repositorio.
 
 La construcción usa `base: './'` y funciona tanto en dominio raíz como bajo `/nombre-del-repositorio/`. `dist/` es el artefacto publicable; ningún servidor de procesamiento es necesario. El workflow CI verifica cada push y pull request; el despliegue solo se activa manualmente y ejecuta las pruebas antes de publicar.
 

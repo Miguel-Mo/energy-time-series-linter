@@ -1,6 +1,6 @@
 # H10 — Preparación de la beta
 
-Versión candidata: **0.9.0**. La preparación local no equivale a una publicación: esta copia no tiene todavía repositorio remoto, URL pública ni GitHub Issues operativo. El destino debe quedar fijado antes de subirla.
+Versión beta: **0.9.0**. Repositorio: https://github.com/Miguel-Mo/energy-time-series-linter. Incidencias: https://github.com/Miguel-Mo/energy-time-series-linter/issues. Sitio previsto: https://miguel-mo.github.io/energy-time-series-linter/. El resultado observado del despliegue se registra en docs/verification.md.
 
 ## Uso rápido
 
@@ -19,11 +19,11 @@ Alcance: UTF-8, un archivo de hasta 10 MiB, 100.000 registros y 100 columnas; un
 
 Sirve el contenido del ZIP por HTTPS o localhost (por ejemplo `python -m http.server 8000 --bind 127.0.0.1` en la carpeta extraída). No abras el index de la app por file:. Mantén juntos todos los archivos y avisos.
 
-## Publicación pendiente
+## Publicación y actualizaciones
 
-Una vez elegido el repositorio público, sube el código y habilita Issues y Pages con GitHub Actions. Espera el CI Linux; ejecuta manualmente Deploy Pages y comprueba el sitio publicado bajo su ruta real, incluidos ejemplos, informe HTML y avisos. Crea la entrega como prerelease, con notas y el ZIP comprobado. No declares pública o aprobada una ejecución que no se haya observado.
+El repositorio público usa Issues y Pages con GitHub Actions. Para actualizar, sube el código. Espera el CI Linux; ejecuta manualmente Deploy Pages y comprueba el sitio publicado bajo su ruta real, incluidos ejemplos, informe HTML y avisos. Crea la entrega como prerelease, con notas y el ZIP comprobado. No declares pública o aprobada una ejecución que no se haya observado.
 
-Las plantillas de fallos y mejoras se preparan en `.github/ISSUE_TEMPLATE`, conforme a la [sintaxis oficial de GitHub](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms). [SUPPORT.md](../SUPPORT.md) ofrece una alternativa manual mientras no exista el repositorio. Los enlaces de ayuda locales no envían información.
+Las plantillas de fallos y mejoras se preparan en `.github/ISSUE_TEMPLATE`, conforme a la [sintaxis oficial de GitHub](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms). [SUPPORT.md](../SUPPORT.md) ofrece una plantilla manual para preparar la incidencia. Los enlaces de ayuda locales no envían información.
 
 ## Reversión
 

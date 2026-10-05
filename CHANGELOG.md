@@ -1,11 +1,11 @@
 # Changelog
 
-## 0.9.0 — 2026-10-05 — candidata beta, sin publicar
+## 0.9.0 — 2026-10-05 — beta
 
 - H10: guía de beta y soporte desde la interfaz; plantillas de fallos/mejoras y guía de contribución.
 - Licencia MIT y atribuciones CoSSMic/OPSD, UCI y dependencias incluidas en la distribución estática.
 - Comprobación de distribución, manifiesto SHA-256 y ZIP local verificable. CI y Pages comprueban el paquete antes de publicar.
-- Publicación y canal GitHub Issues pendientes de definir el repositorio remoto.
+- Repositorio público Miguel-Mo/energy-time-series-linter y canal GitHub Issues habilitados.
 
 ## 0.8.0 — 2026-10-05
 
