@@ -1,4 +1,4 @@
-export const APP_VERSION = '0.7.0';
+export const APP_VERSION = '0.8.0';
 export const MAX_BYTES = 10 * 1024 * 1024;
 export const MAX_ROWS = 100_000;
 export const MAX_COLUMNS = 100;

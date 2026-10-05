@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0 — 2026-10-05
+
+- H9: informe HTML autónomo para lectura sin conexión e impresión, junto al JSON 2.0.0 existente.
+- Resumen, configuración, hallazgos sin filtros, muestras acotadas y cobertura de reglas; advertencias de privacidad y límites incluidas.
+- Escape de valores y CSP sin scripts ni recursos remotos; pruebas de apertura como archivo local en los tres motores.
+
 ## 0.7.0 — 2026-10-05
 
 - H8: matriz Chromium escritorio/móvil emulado, Firefox y WebKit; CI y Pages preparados para los tres motores.

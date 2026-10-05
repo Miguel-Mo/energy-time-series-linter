@@ -23,7 +23,7 @@ Abre la dirección local mostrada por Vite. `npm run dev` sirve para desarrollo;
 2. Revisa la vista previa y las columnas, separador, decimal, unidad y tipo de medición. Las sugerencias no equivalen a confirmación. Potencia instantánea y media no se pueden distinguir con una cabecera `kW`.
 3. Para fechas sin offset, indica una zona IANA como `Europe/Madrid`. Para potencia media y energía por intervalo, declara la duración y si el timestamp marca inicio o fin. La cadencia entre timestamps se configura aparte de la duración de cada medición; opcionalmente, indica el primer y último timestamp esperados para evaluar ausencias en los extremos.
 4. Confirma la configuración y pulsa **Analizar archivo**.
-5. Filtra hallazgos y selecciona uno para inspeccionar sus registros. Descarga el informe JSON si lo necesitas.
+5. Filtra hallazgos y selecciona uno para inspeccionar sus registros. Descarga el informe HTML para leerlo, compartirlo o imprimirlo sin la aplicación; conserva el JSON para procesamiento automático.
 
 El archivo original nunca se modifica. Los negativos pueden representar exportación. Ante horas locales repetidas o inexistentes se solicitan offsets del origen, sin resolverlas automáticamente. Los totales de intervalos suman únicamente los registros disponibles; no incluyen huecos.
 
@@ -35,7 +35,7 @@ El archivo original nunca se modifica. Los negativos pueden representar exportac
 - No se guarda el CSV en localStorage, sessionStorage, cookies, IndexedDB o un servidor. Cerrar la página descarta los datos; el navegador conserva sus propios recursos estáticos según su caché.
 - La carga inicial necesita acceso al servidor estático. Es posible desconectar Internet y analizar mientras la página sigue abierta. No se promete recargar la página sin red ni se instala un service worker.
 - El informe exportado **sí contiene el nombre, hash y muestras de celdas**. Su descarga es manual; revísalo antes de compartirlo.
-- Se exporta solo JSON. No hay exportación CSV ni ejecución de fórmulas. Los contenidos del archivo se muestran como texto, nunca como HTML.
+- Se exporta JSON o un informe HTML autónomo sin scripts ni recursos remotos. No hay exportación CSV ni ejecución de fórmulas. Las celdas se muestran como texto escapado. El HTML descargado sí se puede abrir directamente como archivo local.
 
 ## Pruebas y revisión visual
 
@@ -68,6 +68,7 @@ La construcción usa `base: './'` y funciona tanto en dominio raíz como bajo `/
 - [Formatos reales verificados y límites de H6](docs/real-format-compatibility.md)
 - [H7: guía de zonas horarias y cambios de hora](docs/temporal-guidance.md)
 - [H8: navegadores y reproducibilidad del JSON](docs/browser-reproducibility.md)
+- [H9: informe HTML portátil e imprimible](docs/portable-report.md)
 - [Verificación y capturas](docs/verification.md)
 - [Entrega de usabilidad 0.2.0](docs/milestones.md)
 - [H1: evaluación interna sin participantes y guía de prueba](docs/h1-internal-evaluation.md)

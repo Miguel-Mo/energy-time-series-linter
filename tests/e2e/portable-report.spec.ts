@@ -1,0 +1,36 @@
+import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+import { pathToFileURL } from 'node:url';
+import { disconnectNetwork } from './network';
+import AxeBuilder from '@axe-core/playwright';
+
+test('HTML export opens as a local standalone report, preserves filtered findings and stays inert', async ({ page, context }, testInfo) => {
+  await page.goto('/'); await expect(page.getByRole('status')).toContainText('Listo');
+  await disconnectNetwork(context);
+  await page.locator('#file').setInputFiles({ name: 'hostile.csv', mimeType: 'text/csv', buffer: Buffer.from('timestamp,power_kW\n2024-01-01T00:00Z,<img src=https://example.com/x onerror=alert(1)>\n2024-01-01T00:00Z,2') });
+  await expect(page.getByRole('status')).toContainText('Archivo leído');
+  await page.getByLabel('Tipo de medición').selectOption('power-instant');
+  await page.getByLabel('He revisado').check(); await page.getByRole('button', { name: 'Analizar archivo' }).click();
+  await expect(page.getByRole('status')).toContainText('Análisis terminado');
+  await page.getByLabel('Severidad').selectOption('info');
+  const downloading = page.waitForEvent('download'); await page.getByRole('button', { name: 'Descargar informe HTML' }).click();
+  const download = await downloading; expect(download.suggestedFilename()).toBe('energy-time-series-report.html');
+  const path = testInfo.outputPath('standalone.html'); await download.saveAs(path);
+  expect(await readFile(path, 'utf8')).toContain('TS_DUPLICATE_TIMESTAMP');
+  const standalone = await context.newPage(); const network: string[] = [];
+  standalone.on('request', request => { if (/^https?:|^wss?:/.test(request.url())) network.push(request.url()); });
+  await standalone.goto(pathToFileURL(path).href);
+  await expect(standalone.getByRole('heading', { name: 'Informe de serie energética', exact: true })).toBeVisible();
+  await expect(standalone.locator('body')).toContainText('TS_DUPLICATE_TIMESTAMP');
+  await expect(standalone.locator('body')).toContainText('<img src=');
+  await expect(standalone.locator('script,img,iframe')).toHaveCount(0);
+  expect(network).toEqual([]);
+  expect((await new AxeBuilder({ page: standalone }).withTags(['wcag2a', 'wcag2aa']).analyze()).violations).toEqual([]);
+  await standalone.emulateMedia({ media: 'print' });
+  await expect(standalone.getByRole('heading', { name: 'Cobertura y límites' })).toBeVisible();
+  await standalone.screenshot({ path: testInfo.outputPath('portable-print.png'), fullPage: true });
+  await standalone.setViewportSize({ width: 320, height: 800 });
+  expect(await standalone.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByLabel('Unidad', { exact: true }).selectOption('W');
+  await expect(page.getByRole('button', { name: 'Descargar informe HTML' })).toBeHidden();
+});

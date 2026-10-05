@@ -1,5 +1,7 @@
 # Informe JSON 2.0.0
 
+La app 0.8.0 añade [un informe HTML autónomo](portable-report.md) para lectura e impresión. El JSON y su versión de formato se conservan; el HTML es una presentación y no se reimporta.
+
 Formato propio de salida de la aplicación, no estándar energético ni certificado. UTF-8, JSON con sangría de dos espacios y salto de línea final. `null` significa no determinable/no disponible; nunca cero implícito. Todos los números exportados son finitos. No incluye fecha de ejecución para conservar reproducibilidad.
 
 | Campo | Contenido |

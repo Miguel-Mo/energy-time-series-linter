@@ -1,3 +1,4 @@
+import { portableReport } from './portable-report';
 import AnalyzerWorker from './worker?worker&inline';
 import { EXAMPLES } from './examples';
 import { REAL_EXAMPLES } from './real-examples';
@@ -34,7 +35,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <details><summary>Umbrales de advertencia</summary><div class="form-grid advanced"><label>Magnitud máxima (unidad elegida)<input id="high" type="number" min="0.000001" step="any" placeholder="Desactivado"/></label><label>Valor constante durante (h)<input id="constant" type="number" min="0.000001" step="any" value="24" required/></label><label>Salto relativo (factor)<input id="jump" type="number" min="1.000001" step="any" value="10" required/></label></div></details>
       <label class="confirmation"><input id="confirm" type="checkbox" required/><span>He revisado las columnas, la unidad y la interpretación temporal.</span></label><button id="analyze" type="submit" class="primary">Analizar archivo <span aria-hidden="true">→</span></button></form></div>
     </section>
-    <section id="results" hidden aria-labelledby="results-title"><div class="section-heading"><div><p class="eyebrow">03 / INFORME</p><h2 id="results-title" tabindex="-1">Una visión de tu serie.</h2></div><button id="download" class="primary">↓ &nbsp; Descargar JSON</button></div>
+    <section id="results" hidden aria-labelledby="results-title"><div class="section-heading"><div><p class="eyebrow">03 / INFORME</p><h2 id="results-title" tabindex="-1">Una visión de tu serie.</h2></div><div class="export-actions"><button id="download-html" class="primary" aria-describedby="export-help">Descargar informe HTML</button><button id="download" class="quiet">↓ &nbsp; Descargar JSON</button></div></div>
       <div id="summary" class="summary-grid"></div><p id="completeness-explanation" class="guidance"></p><div class="panel energy-panel"><div><p class="eyebrow">ENERGÍA</p><h3 id="energy-total"></h3><p id="energy-explanation"></p></div><span class="estimate-tag">CÁLCULO EXPLICADO</span></div>
       <div class="panel findings-panel"><div class="panel-title findings-heading"><div><h3>Hallazgos</h3><p class="muted small">Selecciona uno para ver la causa y los registros afectados.</p></div><label class="filter-label">Severidad<select id="severity"><option value="all">Todas</option><option value="error">Errores</option><option value="warning">Advertencias</option><option value="info">Información</option></select></label></div><div id="findings"></div><div id="detail" hidden></div></div>
       <details class="panel audit"><summary>Reglas ejecutadas y límites del informe</summary><p id="audit"></p><p>Hasta 50 ejemplos por regla; los recuentos incluyen todos los hallazgos. Las celdas de muestra se recortan a 160 caracteres. No se exporta CSV ni se ejecuta el contenido de sus celdas.</p></details>
@@ -54,7 +55,7 @@ const exampleHelp = document.createElement('p'); exampleHelp.id = 'example-help'
 el('preview').tabIndex = 0; el('preview').setAttribute('role', 'region'); el('preview').setAttribute('aria-label', 'Vista previa del CSV, desplazable');
 el('setup').querySelector('.workspace')!.before(exampleHelp);
 const exportHelp = document.createElement('p'); exportHelp.className = 'guidance'; exportHelp.id = 'export-help';
-exportHelp.textContent = 'El JSON incluye el nombre y hash del archivo, la configuración y muestras de celdas. Se descarga en tu dispositivo; no se envía automáticamente. Revisa su contenido antes de compartirlo.';
+exportHelp.textContent = 'El HTML permite leer e imprimir el informe sin la aplicación; el JSON sirve para procesamiento automático. Ambos incluyen el nombre y hash del archivo, la configuración y muestras de celdas. Se descarga en tu dispositivo; no se envía automáticamente. Revisa su contenido antes de compartirlo.';
 el('results').querySelector('.section-heading')!.after(exportHelp);
 el('download').setAttribute('aria-describedby', 'export-help');
 document.querySelector('.privacy')!.textContent = 'Tu archivo se procesa en este dispositivo y no se sube a ningún servidor.';
@@ -245,9 +246,16 @@ select('severity').onchange = renderFindings;
 input('finding-search').oninput = renderFindings;
 input('finding-row').oninput = renderFindings;
 el('clear-filters').onclick = () => { select('severity').value = 'all'; input('finding-search').value = ''; input('finding-row').value = ''; renderFindings(); input('finding-search').focus(); };
+el('download-html').onclick = () => {
+  if (!report) return;
+  downloadReport(portableReport(report), 'text/html;charset=utf-8', 'html');
+};
+function downloadReport(content: string, type: string, extension: string) {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const a = document.createElement('a'); a.href = url; a.download = `energy-time-series-report.${extension}`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 el('download').onclick = () => {
   if (!report) return;
-  const url = URL.createObjectURL(new Blob([serializeReport(report)], { type: 'application/json' }));
-  const a = document.createElement('a'); a.href = url; a.download = 'energy-time-series-report.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  downloadReport(serializeReport(report), 'application/json', 'json');
 };
 installTemporalGuide(); initializeForm(); startWorker();

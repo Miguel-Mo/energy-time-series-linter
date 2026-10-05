@@ -1,4 +1,10 @@
-# Verificación de la entrega 0.7.0
+# Verificación de la entrega 0.8.0
+
+H9, 5 de octubre de 2026, Windows: **95 pruebas unitarias y 76 pruebas de navegador correctas**, suite completa en 3,5 minutos, sin reintentos. Build TypeScript/Vite y catálogo correctos; paridad exacta del JSON de los casos H8 confirmada. Mismos motores registrados en H8. Paquete JS de 964,68 kB (182,97 kB gzip), con aviso de tamaño de Vite.
+
+El nuevo informe HTML se descargó y abrió por `file:` sin red en Chromium escritorio/móvil emulado, Firefox y WebKit. Se verificaron hallazgos completos tras filtrar la interfaz, contenido hostil inerte, cero recursos remotos, axe, estilo de impresión, reflow a 320 px e invalidación al editar la configuración. Captura de impresión inspeccionada. Las pruebas unitarias verifican además cero frente a null, subtotal separado del total, escape de campos, recuentos con muestras truncadas y ausencia de mutaciones del informe original. [Uso y límites de H9](portable-report.md): no valida toda paginación de PDF, impresoras ni dispositivos físicos.
+
+## Base anterior: entrega 0.7.0
 
 H8, 5 de octubre de 2026, Windows: **93 pruebas unitarias y 72 pruebas de navegador correctas**. Ejecución completa de Playwright con un proceso, sin reintentos: 3,5 minutos, salida 0. Build TypeScript/Vite y catálogo correctos. Permanece el aviso de tamaño del paquete con los ejemplos locales (958,20 kB de JS; 180,25 kB gzip).
 
