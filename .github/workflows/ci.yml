@@ -18,6 +18,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npx playwright test --project=webkit tests/e2e/app.spec.ts -g "keyboard, accessible"
       - run: npm run test:e2e
       - run: npm run test:parity
       - run: npm run release:check
