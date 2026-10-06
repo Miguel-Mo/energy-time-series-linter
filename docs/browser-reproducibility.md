@@ -27,7 +27,7 @@ La prueba de teclado detectó también el comportamiento distinto del enlace de 
 3. `npm run docs:check` y `npm test`.
 4. `npm run build`, `npm run test:e2e` y, solo si pasa la suite, `npm run test:parity`.
 
-CI y el workflow manual de Pages incluyen instalación de los tres motores y la comprobación de paridad. Sus ejecuciones remotas siguen sin verificarse hasta subir el repositorio. Las versiones de Playwright y dependencias están fijadas en package-lock.json.
+CI y el workflow manual de Pages incluyen instalación de los tres motores y la comprobación de paridad. Sus ejecuciones remotas se verificaron al publicar 0.9.0; consulta docs/verification.md para los enlaces y la corrección de diseño estrecho encontrada en WebKit/Linux. Las versiones de Playwright y dependencias están fijadas en package-lock.json.
 
 ## Límites de la reproducibilidad
 

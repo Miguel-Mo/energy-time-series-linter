@@ -1,10 +1,20 @@
-# Verificación de la candidata beta 0.9.0
+# Verificación de la beta pública 0.9.0
+
+H10 cerrado el 6 de octubre de 2026. [Beta pública](https://miguel-mo.github.io/energy-time-series-linter/) y [repositorio/Issues](https://github.com/Miguel-Mo/energy-time-series-linter) operativos.
+
+El código `fb1c9cc` pasó **95 pruebas unitarias y 80 de navegador en Linux**, sin reintentos: [CI](https://github.com/Miguel-Mo/energy-time-series-linter/actions/runs/37377160680), paridad JSON y distribución correctas. [Deploy Pages](https://github.com/Miguel-Mo/energy-time-series-linter/actions/runs/37377160532) también completó sus verificaciones y el despliegue. Los intentos anteriores detectaron desbordamiento del selector de hora separada a 320 px en WebKit/Linux. Se corrigieron la apariencia y el desbordamiento del texto seleccionado, manteniendo teclado, opciones desplegables y el límite de la prueba; no se ocultó el desbordamiento global de la página.
+
+Comprobación del sitio publicado con Chromium 153.0.8010.12: ocho recursos con HTTP 200 y hashes idénticos al manifiesto local; ejemplo sintético con 2 kWh aproximados; descargas JSON y HTML tras desconectar la red; cero solicitudes posteriores y cero errores de página. El ZIP de entrega contiene esos mismos recursos y su manifiesto. SHA-256 del ZIP: `251325ca5f9da96b687459d03fc533ec3d4201d0d2a35726f9fe5c9220618107`. Las actualizaciones posteriores a `fb1c9cc` para cerrar H10 solo documentan esta evidencia y no cambian la distribución.
+
+Se conservan los límites de beta, las pruebas móviles emuladas, la ausencia de participantes y las restricciones de WebKit descritas anteriormente. Publicar no equivale a certificar conformidad ni precisión física de los datos.
+
+## Preparación local anterior de 0.9.0
 
 H10, preparación local, 5 de octubre de 2026, Windows: **95 pruebas unitarias y 80 pruebas de navegador correctas**, suite íntegra en 3,5 minutos y paridad JSON correcta. Build y catálogo correctos. El aviso de tamaño permanece: 965,44 kB de JS, 183,25 kB gzip.
 
 Se verificaron desde la interfaz las cinco rutas de guía, soporte y licencias en Chromium escritorio/móvil emulado, Firefox y WebKit. `release:check` comprobó los ocho archivos distribuidos y generó el manifiesto SHA-256. El ZIP contiene esos ocho archivos más el manifiesto; comprobación CRC y todos los hashes internos correctos. No incluye cachés, CSV de usuario ni resultados de pruebas. Las plantillas de Issues están preparadas, pero su funcionamiento remoto no se ha probado.
 
-La publicación sigue pendiente: no hay remoto, CI Linux observado ni URL pública verificada. Por ello H10 no se declara cerrado como beta pública. [Procedimiento y condiciones de publicación](beta-release.md).
+En esa fase local aún faltaban remoto, CI Linux y URL pública; la evidencia de cierre figura arriba. [Procedimiento de publicación y actualizaciones](beta-release.md).
 
 ## Base anterior: entrega 0.8.0
 

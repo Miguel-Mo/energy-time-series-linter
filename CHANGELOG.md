@@ -1,11 +1,12 @@
 # Changelog
 
-## 0.9.0 — 2026-10-05 — beta
+## 0.9.0 — 2026-10-06 — beta
 
 - H10: guía de beta y soporte desde la interfaz; plantillas de fallos/mejoras y guía de contribución.
 - Licencia MIT y atribuciones CoSSMic/OPSD, UCI y dependencias incluidas en la distribución estática.
 - Comprobación de distribución, manifiesto SHA-256 y ZIP local verificable. CI y Pages comprueban el paquete antes de publicar.
-- Repositorio público Miguel-Mo/energy-time-series-linter y canal GitHub Issues habilitados.
+- Repositorio público Miguel-Mo/energy-time-series-linter, GitHub Issues y Pages verificados. CI Linux: 95 pruebas unitarias y 80 de navegador correctas.
+- Corregido el desbordamiento de texto largo de selectores en WebKit/Linux a 320 px; funcionamiento sin conexión y exportación comprobados en la web publicada.
 
 ## 0.8.0 — 2026-10-05
 
